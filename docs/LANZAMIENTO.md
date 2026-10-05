@@ -47,7 +47,7 @@ Cotiza con 2 o 3 talleres para confirmarlo.
 
 - [ ] Antes de cobrar en real, los mensajes **necesitan el backend**: con un Payment Link fijo, el mensaje y el nombre que escribe la persona no te llegan. Opción rápida: un formulario (Tally / Google Forms) que pida mensaje, nombre para el techo y folio del pago; o el webhook de la pasarela.
 - [ ] Revisar cada mensaje y nombre antes de imprimir (sin marcas, anuncios, links, groserías, política ni datos personales) y guardar el correo de confirmación.
-- [ ] Imprimir por tandas, al menos una vez al mes mientras haya pendientes (cláusula 13). Caben ≈85 mensajes por salpicadera con letras de 1.5-2 cm; vinil de corte o impresión de plancha nueva por tanda: cotízalo.
+- [ ] Imprimir por tandas, al menos una vez al mes mientras haya pendientes (cláusula 13). La página dice "hasta agotar existencias" y no muestra el límite; el límite real es `MESSAGES_PER_PART` (85 por lado, ≈170). Si al rotular la primera tanda ves que caben más, súbelo: con 120 por lado, vendiendo todo se llega a la meta.
 - [ ] Ojo con la comisión: en $100 la pasarela se lleva ≈$7 (≈7%).
 - [ ] Borrar `EXAMPLE_MESSAGES` en `src/data/parts.ts` antes de lanzar.
 
