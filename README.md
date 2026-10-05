@@ -4,47 +4,84 @@ Página web del proyecto **Proyect Car**: vendo mi Fiat Palio 2013 en pedazos. C
 
 > Versión de prueba: los pagos están simulados.
 
-## Qué tiene
+## Stack
 
-- Portada con letras recortadas, video teaser y medidor de la meta.
-- **Vitrina 3D** del Palio (Three.js). Al tocar una pieza, una cortina de garage te lleva al **garage estilo videojuego**: menú de piezas, ficha con estadísticas, cámara que vuela a cada pieza y botón de compra.
-- 15 piezas a la venta (puertas, cofre, techo, defensas, salpicaderas, costados, portón, medallón y franja del parabrisas).
-- Periódico doblado que se desenrolla al tocarlo.
-- Mapa de zonas en Monterrey (base: Tec de Monterrey).
-- Español / inglés y pesos / dólares (detección automática + botones manuales).
-- Encabezado fijo con la sección actual y un carrito que avanza con el scroll.
+- **React 19 + TypeScript**, empaquetado con **Vite 7**
+- **React Router 7**: dos páginas, la landing (`/`) y el garage (`/garage`, `/garage/:pieza`)
+- **Three.js 0.160** (la misma versión del sitio original, para que el 3D se vea igual)
+- Tipografías servidas desde el propio sitio con **Fontsource** (ya no se piden a Google Fonts)
+- **Vitest** para las pruebas unitarias
+
+## Páginas
+
+| Ruta | Qué es |
+|---|---|
+| `/` | Landing: portada, medidor de la meta, cómo funciona, vitrina 3D, mapa, periódico y dudas |
+| `/garage` | Garage estilo videojuego: menú de piezas, ficha con estadísticas, cámara que vuela a cada pieza y checkout |
+| `/garage/cofre` | El garage abierto directo en una pieza (el link se puede compartir) |
+
+Entre las dos páginas se viaja con la cortina de garage. El garage es una descarga aparte: quien solo ve la landing no baja ese código.
+
+## Correrla en tu compu
+
+Necesitas Node.js 20 o más nuevo.
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+```
+
+Otros comandos:
+
+```bash
+npm run build      # revisa tipos y genera dist/ para publicar
+npm run preview    # sirve dist/ como en producción
+npm test           # pruebas unitarias
+```
 
 ## Estructura
 
 ```
-index.html        Toda la página (HTML, CSS y JS en un solo archivo)
-palio.json        Modelo 3D del Palio (GLB en base64) que carga la página
-models/palio.glb  El mismo modelo en .glb, con cada pieza como malla con nombre
-img/              Letras recortadas, textura de papel y foto en puntos
-teaser.mp4/.jpg   Video teaser y su portada
-```
-
-## Correrla en tu compu
-
-La página carga `palio.json` con `fetch`, así que necesita un servidor (no funciona abriendo el archivo con doble clic):
-
-```bash
-npx serve .
-# o
-python3 -m http.server 8000
+public/                 Archivos tal cual: modelo 3D, imágenes, video teaser
+  models/palio.glb      Modelo 3D del Palio, cada pieza es una malla con nombre
+src/
+  main.tsx              Entrada
+  app/                  Router, cortina de garage y avisos (toast)
+  pages/landing/        Landing y sus secciones (Hero, Meter, Showroom, Where, News, Faq…)
+  pages/garage/         Página del garage y el checkout
+  components/           Piezas compartidas: letras recortadas, header, ticker, graffiti
+  three/                Escenas 3D: visor, vitrina, garage, carga del modelo, pintura de piezas
+  data/                 Configuración, piezas y precios
+  state/                Idioma/moneda y ventas
+  i18n/strings.ts       Todos los textos en español e inglés
+  styles/               CSS: base, landing, garage, checkout
 ```
 
 ## Configuración
 
-Todo se edita al inicio del primer `<script>` de `index.html`:
+- `src/data/parts.ts`
+  - `PARTS`: piezas, precios en MXN (`price`) y USD (`usd`), zona, medidas, barras del garage (`vis`, `tam`, `cuadro`) y links de pago (`mp`, `stripe`, `stripeUsd`).
+  - `EXAMPLE_SOLD`: ventas de **ejemplo** para ver cómo se ven las piezas vendidas. Bórralas antes de lanzar.
+- `src/data/config.ts`: `PAY_MODE` (`'test'` simula el pago), `GOAL_MXN` y la ruta del modelo.
+- `src/i18n/strings.ts`: textos en español (`es`) e inglés (`en`).
 
-- `window.PARTS`: piezas, precios en MXN (`price`) y USD (`usd`), zona, medidas y barras del garage (`vis`, `tam`, `cuadro`).
-- `window.SOLD`: ventas de **ejemplo** para ver cómo se ven las piezas vendidas. Bórralas antes de lanzar.
-- `window.PAY_MODE`: `'test'` simula el pago. Para cobrar de verdad:
-  1. Crea un Payment Link por pieza en Mercado Pago (`mp`) y/o Stripe (`stripe`; `stripeUsd` para cobrar en dólares).
-  2. Pégalos en cada pieza de `window.PARTS` y cambia `PAY_MODE` a `'live'`.
-  3. Para marcar piezas como vendidas automáticamente hace falta un backend pequeño con webhook (por ejemplo Supabase o Vercel Functions).
+Para cobrar de verdad:
+
+1. Crea un Payment Link por pieza en Mercado Pago (`mp`) y/o Stripe (`stripe`; `stripeUsd` para cobrar en dólares).
+2. Pégalos en cada pieza de `PARTS` y cambia `PAY_MODE` a `'live'`.
+3. Para marcar piezas como vendidas automáticamente hace falta un backend con webhook (por ejemplo Supabase o Vercel Functions). En el código, `src/state/sales.tsx` es el único lugar que tendría que cambiar.
+
+## Rendimiento
+
+- La landing carga ~125 KB. Three.js, el modelo 3D y el garage se descargan solo cuando la vitrina está por aparecer en pantalla, o en segundo plano cuando el navegador está libre (no se hace si el teléfono tiene activado el ahorro de datos).
+- El modelo se carga una vez del `.glb`, sin el base64 que lo hacía 33% más pesado, y lo comparten la vitrina y el garage.
+- Cada escena 3D dibuja solo mientras se ve: la vitrina se pausa al salir de pantalla o al cambiar de pestaña.
+- Las sombras se calculan una sola vez, no en cada cuadro, porque nada en la escena se mueve. En celulares se dibuja a máximo 1.5× de densidad de pixeles.
+- El video teaser solo se reproduce mientras está en pantalla.
 
 ## Publicarla
 
-Funciona en cualquier hosting de archivos estáticos: Vercel, Netlify, Cloudflare Pages o GitHub Pages (Settings → Pages → rama `main`, carpeta raíz).
+Es un sitio estático: `npm run build` y se sube la carpeta `dist/`.
+
+- **Vercel**: funciona tal cual, `vercel.json` ya manda las rutas como `/garage` a la app.
+- **Netlify / Cloudflare Pages**: build `npm run build`, carpeta `dist`. `public/_redirects` ya está incluido.
