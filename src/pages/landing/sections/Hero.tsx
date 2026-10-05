@@ -1,16 +1,8 @@
-import { useEffect, useRef } from 'react';
 import { Ransom } from '../../../components/Ransom';
 import { useLocale } from '../../../state/locale';
 
 export function Hero() {
   const { t, money, goal, cur } = useLocale();
-  const video = useRef<HTMLVideoElement>(null);
-  // the teaser only downloads and plays while it is on screen
-  useEffect(() => {
-    const v = video.current!;
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); });
-    io.observe(v); return () => io.disconnect();
-  }, []);
   return (
     <section className="hero">
       <div className="halftone-bg" aria-hidden="true" />
@@ -28,7 +20,8 @@ export function Hero() {
       <figure className="teaser paper">
         <span className="tape" aria-hidden="true" />
         <span className="roundel paper" aria-hidden="true">13</span>
-        <video ref={video} src="/teaser.mp4" poster="/teaser.jpg" muted playsInline loop controls preload="none" aria-label="Video teaser del proyecto" />
+        {/* foto provisional (render del modelo 3D): reemplaza public/img/palio-foto.webp por una foto real, 4:5 vertical */}
+        <img src="/img/palio-foto.webp" width={720} height={900} alt={t('teaser.alt')} fetchPriority="high" decoding="async" />
         <figcaption>{t('teaser.cap')}</figcaption>
       </figure>
     </section>
