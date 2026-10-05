@@ -1,6 +1,6 @@
 # Proyect Car
 
-Página web del proyecto **Proyect Car**: vendo mi Fiat Palio 2013 en pedazos. Cada pieza del carro se vende como espacio publicitario (estilo Million Dollar Homepage) para juntar **$120,000 MXN** y comprar un project car.
+Página web del proyecto **Proyect Car**: vendo mi Fiat Palio 2013 en pedazos. Doce piezas del carro se venden a marcas como espacio publicitario (estilo Million Dollar Homepage), las salpicaderas delanteras venden mensajes de $100 (hasta agotar existencias) y el techo lleva gratis los nombres de quienes dejan mensaje. La meta: **$150,000 MXN** para comprar un project car.
 
 > Versión de prueba: los pagos están simulados.
 
@@ -65,7 +65,7 @@ src/
 - `src/data/parts.ts`
   - `PARTS`: piezas, precio final en MXN (`price`; el de USD se calcula con el tipo de cambio de `src/data/currency.ts`), zona, medidas del vinil, barras del garage (`vis`, `tam`, `cuadro`) y links de pago (`mp`, `stripe`, `stripeUsd`).
   - `EXAMPLE_SOLD`: ventas de **ejemplo** para ver cómo se ven las piezas vendidas. Bórralas antes de lanzar.
-  - **Mensajes de la raza**: las salpicaderas delanteras no se venden a marcas. Cada persona compra un mensaje de hasta `MESSAGE_MAX` (24) caracteres al precio de la salpicadera en `PARTS` ($100); caben `MESSAGES_PER_PART` (85) por lado, ≈170 en total. De regalo, su nombre va en el **techo**, que ya no se vende. `EXAMPLE_MESSAGES` son mensajes de **ejemplo**: bórralos antes de lanzar.
+  - **Mensajes de la raza**: las salpicaderas delanteras no se venden a marcas. Cada persona compra un mensaje de hasta `MESSAGE_MAX` (24) caracteres al precio de la salpicadera en `PARTS` ($100); caben `MESSAGES_PER_PART` (120) por lado, 240 en total; la página no muestra el límite, dice "hasta agotar existencias". De regalo, su nombre va en el **techo**, que ya no se vende. `EXAMPLE_MESSAGES` son mensajes de **ejemplo**: bórralos antes de lanzar.
 - `src/data/config.ts`: `PAY_MODE` (`'test'` simula el pago), la meta (`GOAL_MXN`, $150,000) y la ruta del modelo.
 - `src/data/legal.ts`: **datos legales**. Tu nombre, domicilio y correo (mientras falten, las páginas legales los marcan en amarillo), vigencia (6 meses), videos mínimos, plazos del servicio y marcas no aceptadas.
 - `src/i18n/strings.ts`: textos en español (`es`) e inglés (`en`).

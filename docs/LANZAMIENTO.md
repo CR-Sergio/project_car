@@ -13,7 +13,7 @@ La página ya **no habla de IVA ni de factura**: los precios son finales. Aun as
 
 ### Números internos (no se muestran en la página)
 
-Meta pública: **$150,000 MXN**. Las 12 piezas para marcas suman $126,000; las salpicaderas llenas (≈170 mensajes × $100) agregan hasta $17,000. **Vendiendo todo se llega a ≈$143,000: faltan ≈$7,000 para la meta** (ver opciones en la conversación: subir algo las piezas, un mensaje XL o patrocinios por nivel).
+Meta pública: **$150,000 MXN**. Las 12 piezas para marcas suman $126,000; las salpicaderas llenas (240 mensajes × $100) agregan $24,000. **Vendiendo todo se llega justo a la meta.**
 
 | Concepto | Estimado |
 |---|---|
@@ -47,7 +47,7 @@ Cotiza con 2 o 3 talleres para confirmarlo.
 
 - [ ] Antes de cobrar en real, los mensajes **necesitan el backend**: con un Payment Link fijo, el mensaje y el nombre que escribe la persona no te llegan. Opción rápida: un formulario (Tally / Google Forms) que pida mensaje, nombre para el techo y folio del pago; o el webhook de la pasarela.
 - [ ] Revisar cada mensaje y nombre antes de imprimir (sin marcas, anuncios, links, groserías, política ni datos personales) y guardar el correo de confirmación.
-- [ ] Imprimir por tandas, al menos una vez al mes mientras haya pendientes (cláusula 13). La página dice "hasta agotar existencias" y no muestra el límite; el límite real es `MESSAGES_PER_PART` (85 por lado, ≈170). Si al rotular la primera tanda ves que caben más, súbelo: con 120 por lado, vendiendo todo se llega a la meta.
+- [ ] Imprimir por tandas, al menos una vez al mes mientras haya pendientes (cláusula 13). La página dice "hasta agotar existencias" y no muestra el límite; el límite real es `MESSAGES_PER_PART` (120 por lado, 240 en total, letras de ≈1.3 cm), que es lo que cuadra la meta. Confírmalo con el rotulador en la primera tanda.
 - [ ] Ojo con la comisión: en $100 la pasarela se lleva ≈$7 (≈7%).
 - [ ] Borrar `EXAMPLE_MESSAGES` en `src/data/parts.ts` antes de lanzar.
 

@@ -62,10 +62,10 @@ export const MESSAGE_PARTS = PARTS.filter(p => p.kind === 'messages');
 export const MESSAGE_PRICE_MXN = MESSAGE_PARTS[0].price;
 /** caracteres por mensaje */
 export const MESSAGE_MAX = 24;
-/** límite interno de mensajes por salpicadera (≈95 × 45 cm, letras de ≈1.5-2 cm: 4 columnas × 22 renglones).
-    En la página NO se muestra: se venden "hasta agotar existencias". Si se rotulan más chicos caben más: sube este número
-    (con 120 por lado, vendiendo todo se llega a la meta). */
-export const MESSAGES_PER_PART = 85;
+/** límite interno de mensajes por salpicadera (≈95 × 45 cm, letras de ≈1.3 cm: 4 columnas × 30 renglones).
+    En la página NO se muestra: se venden "hasta agotar existencias". 120 por lado (240 en total) es lo que hace
+    que, vendiendo todo, se llegue a la meta de $150,000. */
+export const MESSAGES_PER_PART = 120;
 export const MESSAGES_CAPACITY = MESSAGES_PER_PART * MESSAGE_PARTS.length;
 /** a partir de cuántos lugares libres se avisa "quedan pocos" */
 export const MESSAGES_LOW = 20;

@@ -21,7 +21,9 @@ describe('parts catalog', () => {
     expect(BRAND_PARTS).toHaveLength(12);
     expect(MESSAGE_PARTS.map(p => p.id)).toEqual(['salpi-i', 'salpi-d']);
     expect(MESSAGE_PARTS.every(p => p.price === 100)).toBe(true);
-    expect(MESSAGES_CAPACITY).toBe(170);
+    expect(MESSAGES_CAPACITY).toBe(240);
+    // selling every brand part and every message reaches the goal
+    expect(BRAND_PARTS.reduce((a, p) => a + p.price, 0) + MESSAGES_CAPACITY * 100).toBeGreaterThanOrEqual(GOAL_MXN);
     expect(PART_BY_ID[NAMES_PART_ID]).toMatchObject({ kind: 'names', price: 0 });
     for (const id of Object.keys(EXAMPLE_SOLD)) expect(PART_BY_ID[id].kind).toBeUndefined();
   });
