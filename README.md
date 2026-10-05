@@ -64,7 +64,7 @@ src/
   - `EXAMPLE_SOLD`: ventas de **ejemplo** para ver cómo se ven las piezas vendidas. Bórralas antes de lanzar.
 - `src/data/config.ts`: `PAY_MODE` (`'test'` simula el pago), `GOAL_MXN` y la ruta del modelo.
 - `src/i18n/strings.ts`: textos en español (`es`) e inglés (`en`).
-- **Foto de la portada**: `public/img/palio-foto.webp`, vertical 4:5 (por ejemplo 720 × 900). La de ahora es provisional (un render del modelo 3D en plateado); reemplázala por una foto real con el mismo nombre.
+- **Foto de la portada**: `public/img/palio-foto.webp`, horizontal 13:9 (650 × 450 o más grande). Para cambiarla, reemplaza el archivo con el mismo nombre.
 
 ### Piezas y modelo 3D
 

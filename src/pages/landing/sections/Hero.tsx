@@ -20,8 +20,8 @@ export function Hero() {
       <figure className="teaser paper">
         <span className="tape" aria-hidden="true" />
         <span className="roundel paper" aria-hidden="true">13</span>
-        {/* foto provisional (render del modelo 3D): reemplaza public/img/palio-foto.webp por una foto real, 4:5 vertical */}
-        <img src="/img/palio-foto.webp" width={720} height={900} alt={t('teaser.alt')} fetchPriority="high" decoding="async" />
+        {/* foto de la portada: public/img/palio-foto.webp, horizontal 13:9 (650 × 450 o más grande) */}
+        <img src="/img/palio-foto.webp" width={650} height={450} alt={t('teaser.alt')} fetchPriority="high" decoding="async" />
         <figcaption>{t('teaser.cap')}</figcaption>
       </figure>
     </section>
