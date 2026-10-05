@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { PART_BY_ID, type SoldMap } from '../data/parts';
+import { GOAL_MXN } from '../lib/budget';
 import { REDUCED } from '../lib/motion';
 import { loadPalio } from './model';
 import { paintAll, pulseSelected, setSelected, setSold } from './paint';
@@ -146,7 +147,7 @@ export function createGarage(host: HTMLElement, sold: SoldMap, { onPart, onLoade
     const poster=(lines: [string, number, number, string?][], bg: string, fg: string)=>ctex(512,720,(g,w,h)=>{ g.fillStyle=bg; g.fillRect(0,0,w,h); g.fillStyle='rgba(0,0,0,.12)'; for(let i=0;i<2000;i++) g.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);
       g.fillStyle=fg; g.textAlign='center'; lines.forEach(([t,size,y,font])=>{ g.font=`${size}px ${font||'"Bowlby One",Impact'}`; g.fillText(t,w/2,y); }); });
     const p1=poster([['GRAN PREMIO',58,120],['REGIO',120,250],['13',240,520],['domingo · 10 am',34,660,'"Special Elite",monospace']],'#e2252e','#ece6d6');
-    const p2=poster([['SE VENDEN',64,130],['PIEZAS',96,240],['puertas · cofre',36,360,'"Special Elite",monospace'],['techo · defensas',36,410,'"Special Elite",monospace'],['$120,000',80,590]],'#ece6d6','#141214');
+    const p2=poster([['SE VENDEN',64,130],['PIEZAS',96,240],['puertas · cofre',36,360,'"Special Elite",monospace'],['techo · defensas',36,410,'"Special Elite",monospace'],['$'+GOAL_MXN.toLocaleString('en-US'),80,590]],'#ece6d6','#141214');
     const p3=poster([['FULL',120,200],['GAS',150,360],['MTY',90,560]],'#f1c232','#141214');
     for(const [tex,x,y,z,rz] of [[p1,4.2,2.5,-10.1,.04],[p2,-7.4,2.3,-7.9,-.05],[p3,10.4,2.4,-3.2,.03]] as [THREE.Texture, number, number, number, number][]){
       const m=new THREE.Mesh(new THREE.PlaneGeometry(1.25,1.75),new THREE.MeshStandardMaterial({map:tex,roughness:.9})); onWall(m,x,y,z); m.rotateZ(rz); }

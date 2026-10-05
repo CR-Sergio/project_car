@@ -29,8 +29,8 @@ export function Meter() {
   return (
     <div className="meter paper" role="group" aria-label="Avance de la meta">
       <div className="meter-head">
-        <div className="big"><span ref={num}>{money(shown)}</span> <small>/ {money(goal)} {cur}</small></div>
-        <div className="meta"><span>{pct.toFixed(0)}%</span> · <span>{t('soldOf', { n, N })}</span></div>
+        <div className="big"><span ref={num}>{money(shown)}</span> <small>/ {money(goal)} {cur} {t('plusIva')}</small></div>
+        <div className="meta"><span>{pct.toFixed(0)}%</span> · <span>{t('soldOf', { n, N })}</span> · <a href="#presupuesto">{t('meter.detail')}</a></div>
       </div>
       <div className="track"><div className="fill" ref={fill}><span className="car" aria-hidden="true">🏎️</span></div><div className="flag" aria-hidden="true" /></div>
       <div className="ticks" aria-hidden="true">

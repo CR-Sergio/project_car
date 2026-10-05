@@ -23,3 +23,13 @@
 .done .big{font-family:var(--f-display);font-size:40px;color:var(--race);line-height:1}
 .confetti{position:fixed;z-index:97;pointer-events:none;width:14px;height:10px}
 @keyframes cardIn{from{transform:rotate(-6deg) translateY(-14px)}}
+.check{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.4;margin:0 0 10px;cursor:pointer}
+.check input{margin-top:2px;accent-color:var(--race);flex:none;width:16px;height:16px}
+.check a{color:#1d4fb8}
+.invoice{border:2px dashed #0004;padding:12px 12px 4px;margin:0 0 12px}
+.field select{font:inherit;font-size:15px;padding:9px 10px;border:2px solid var(--ink);background:#fbf8f0;color:var(--ink);border-radius:0;width:100%}
+.totals{display:grid;grid-template-columns:1fr auto;gap:3px 12px;margin:4px 0 14px;padding:10px 12px;background:#fbf8f0;border:2px solid var(--ink);font-variant-numeric:tabular-nums}
+.totals dt{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#4d4752;align-self:center}
+.totals dd{margin:0;text-align:right;font-family:var(--f-mono);font-size:14px}
+.totals dt:last-of-type,.totals dd:last-of-type{font-family:var(--f-display);font-size:18px;color:var(--race);letter-spacing:0;text-transform:none;border-top:1px dashed #0005;padding-top:6px}
+.sheet .fine{font-size:11.5px;color:#6b6470;margin:0 0 12px;line-height:1.45}

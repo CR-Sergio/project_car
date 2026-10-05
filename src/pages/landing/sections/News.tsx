@@ -7,7 +7,7 @@ const EASE = 'cubic-bezier(.33,.08,.24,1)', UNROLL = 'cubic-bezier(.42,.02,.3,1)
 
 /** Folded newspaper: tap it, the band snaps off and the page unrolls (the view follows the roll down). */
 export function News() {
-  const { t } = useLocale();
+  const { t, money, goal, cur } = useLocale();
   const [cls, setCls] = useState({ folded: true, lifting: false, unbanding: false });
   const set = (patch: Partial<typeof cls>) => flushSync(() => setCls(c => ({ ...c, ...patch })));
   const body = useRef<HTMLDivElement>(null), roll = useRef<HTMLSpanElement>(null), busy = useRef(false);
@@ -60,7 +60,7 @@ export function News() {
             <p className="deck">{t('news.deck')}</p>
             <div className="news-grid">
               <div className="cols">
-                <p>{t('news.p1')}</p><p>{t('news.p2')}</p><p>{t('news.p3')}</p><p>{t('news.p4')}</p>
+                <p>{t('news.p1')}</p><p>{t('news.p2')}</p><p>{t('news.p3')}</p><p>{t('news.p4', { goal: money(goal) + ' ' + cur })}</p>
               </div>
               <figure className="photo">
                 <div className="img" role="img" aria-label="Foto en puntos de imprenta del Palio con el cofre vendido" />

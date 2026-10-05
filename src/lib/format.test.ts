@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { detectCurrency, detectLang, fill, formatMoney, goalIn } from './format';
+import { GOAL_MXN, GOAL_USD } from './budget';
 
 describe('money and goal', () => {
   it('formats pesos and dollars like the original page', () => {
     expect(formatMoney(14000, 'MXN')).toBe('$14,000');
     expect(formatMoney(750, 'USD')).toBe('US$750');
   });
-  it('uses the fixed peso goal and the sum of dollar prices', () => {
-    expect(goalIn('MXN')).toBe(120000);
-    expect(goalIn('USD')).toBe(6500);
+  it('uses the budget goal in pesos and its dollar conversion', () => {
+    expect(goalIn('MXN')).toBe(GOAL_MXN);
+    expect(goalIn('USD')).toBe(GOAL_USD);
   });
   it('fills {placeholders}', () => {
     expect(fill('{n} de {N} piezas', { n: 3, N: 15 })).toBe('3 de 15 piezas');

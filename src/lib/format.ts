@@ -1,5 +1,5 @@
-import { GOAL_MXN } from '../data/config';
-import { PARTS, type Part } from '../data/parts';
+import { type Part } from '../data/parts';
+import { GOAL_MXN, GOAL_USD } from './budget';
 
 export type Lang = 'es' | 'en';
 export type Currency = 'MXN' | 'USD';
@@ -7,8 +7,8 @@ export type Currency = 'MXN' | 'USD';
 export const priceIn = (p: Part, cur: Currency) => (cur === 'USD' ? p.usd : p.price);
 export const formatMoney = (v: number, cur: Currency) =>
   cur === 'USD' ? 'US$' + v.toLocaleString('en-US') : '$' + v.toLocaleString('es-MX');
-/** la meta en dólares es la suma de los precios en dólares */
-export const goalIn = (cur: Currency) => (cur === 'USD' ? PARTS.reduce((a, p) => a + p.usd, 0) : GOAL_MXN);
+/** la meta (sin IVA); en dólares se convierte con el tipo de cambio */
+export const goalIn = (cur: Currency) => (cur === 'USD' ? GOAL_USD : GOAL_MXN);
 export const escapeHtml = (s: string) =>
   String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 export const fill = (s: string, vars: Record<string, string | number> = {}) =>

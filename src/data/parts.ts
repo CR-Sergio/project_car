@@ -1,15 +1,19 @@
+import { usdOf } from './budget';
+
 export type Zone = 'Frente' | 'Arriba' | 'Lado izq.' | 'Lado der.' | 'Atrás';
 
 export interface Part {
   id: string;
   name: string;
   en: string;
-  /** precio en MXN */
+  /** precio en MXN, MÁS IVA */
   price: number;
+  /** precio en USD, más IVA (se calcula con el tipo de cambio de src/data/budget.ts) */
   usd: number;
   zone: Zone;
+  /** medida del vinil, "≈ ancho × alto cm": de aquí sale el costo del vinil */
   size: string;
-  /** Payment Links (modo live) */
+  /** Payment Links (modo live): el monto del link es el precio CON IVA */
   mp: string;
   stripe: string;
   stripeUsd?: string;
@@ -18,25 +22,29 @@ export interface Part {
   tam: number;
   cuadro: number;
   glass?: boolean;
+  /** vidrio que lleva vinil microperforado (se puede ver hacia afuera desde adentro) */
+  microperf?: boolean;
 }
 
-export const PARTS: Part[] = [
-  {id:'cofre',      name:'Cofre',                           en:'Hood',                   price:14000, usd:750, zone:'Frente',    size:'≈ 115 × 150 cm', mp:'', stripe:'', vis:9, tam:8, cuadro:9},
-  {id:'parabrisas', name:'Franja del parabrisas',           en:'Windshield banner',      price:10000, usd:550, zone:'Frente',    size:'≈ 130 × 20 cm',  mp:'', stripe:'', vis:9, tam:4, cuadro:9, glass:true},
-  {id:'defensa-d',  name:'Defensa delantera',               en:'Front bumper',           price:6000,  usd:325, zone:'Frente',    size:'≈ 160 × 25 cm',  mp:'', stripe:'', vis:7, tam:3, cuadro:6},
-  {id:'techo',      name:'Techo',                           en:'Roof',                   price:14000, usd:750, zone:'Arriba',    size:'≈ 150 × 120 cm', mp:'', stripe:'', vis:6, tam:9, cuadro:7},
-  {id:'puerta-di',  name:'Puerta delantera izquierda',      en:'Front left door',        price:7000,  usd:380, zone:'Lado izq.', size:'≈ 90 × 60 cm',   mp:'', stripe:'', vis:8, tam:6, cuadro:8},
-  {id:'puerta-ti',  name:'Puerta trasera izquierda',        en:'Rear left door',         price:7000,  usd:380, zone:'Lado izq.', size:'≈ 125 × 60 cm',  mp:'', stripe:'', vis:7, tam:7, cuadro:7},
-  {id:'vidrio-ti',  name:'Ventana trasera izquierda',       en:'Rear left window',       price:6000,  usd:325, zone:'Lado izq.', size:'≈ 85 × 40 cm',   mp:'', stripe:'', vis:7, tam:4, cuadro:6, glass:true},
-  {id:'salpi-i',    name:'Salpicadera delantera izquierda', en:'Front left fender',      price:6000,  usd:325, zone:'Lado izq.', size:'≈ 95 × 45 cm',   mp:'', stripe:'', vis:7, tam:5, cuadro:6},
-  {id:'puerta-dd',  name:'Puerta delantera derecha',        en:'Front right door',       price:7000,  usd:380, zone:'Lado der.', size:'≈ 90 × 60 cm',   mp:'', stripe:'', vis:8, tam:6, cuadro:8},
-  {id:'puerta-td',  name:'Puerta trasera derecha',          en:'Rear right door',        price:7000,  usd:380, zone:'Lado der.', size:'≈ 125 × 60 cm',  mp:'', stripe:'', vis:7, tam:7, cuadro:7},
-  {id:'vidrio-td',  name:'Ventana trasera derecha',         en:'Rear right window',      price:6000,  usd:325, zone:'Lado der.', size:'≈ 85 × 40 cm',   mp:'', stripe:'', vis:7, tam:4, cuadro:6, glass:true},
-  {id:'salpi-d',    name:'Salpicadera delantera derecha',   en:'Front right fender',     price:6000,  usd:325, zone:'Lado der.', size:'≈ 95 × 45 cm',   mp:'', stripe:'', vis:7, tam:5, cuadro:6},
-  {id:'porton',     name:'Portón trasero',                  en:'Tailgate',               price:9000,  usd:490, zone:'Atrás',     size:'≈ 120 × 45 cm',  mp:'', stripe:'', vis:8, tam:6, cuadro:7},
-  {id:'medallon',   name:'Medallón (vidrio trasero)',       en:'Rear window',            price:9000,  usd:490, zone:'Atrás',     size:'≈ 95 × 45 cm',   mp:'', stripe:'', vis:8, tam:5, cuadro:7, glass:true},
-  {id:'defensa-t',  name:'Defensa trasera',                 en:'Rear bumper',            price:6000,  usd:325, zone:'Atrás',     size:'≈ 160 × 25 cm',  mp:'', stripe:'', vis:8, tam:3, cuadro:6},
+type PartInput = Omit<Part, 'usd' | 'mp' | 'stripe'> & Partial<Pick<Part, 'mp' | 'stripe'>>;
+const RAW: PartInput[] = [
+  {id:'cofre',      name:'Cofre',                           en:'Hood',                   price:18000, zone:'Frente',    size:'≈ 115 × 150 cm', vis:9, tam:8, cuadro:9},
+  {id:'parabrisas', name:'Franja del parabrisas',           en:'Windshield banner',      price:13000, zone:'Frente',    size:'≈ 130 × 20 cm',  vis:9, tam:4, cuadro:9, glass:true},
+  {id:'defensa-d',  name:'Defensa delantera',               en:'Front bumper',           price:8000,  zone:'Frente',    size:'≈ 160 × 25 cm',  vis:7, tam:3, cuadro:6},
+  {id:'techo',      name:'Techo',                           en:'Roof',                   price:18000, zone:'Arriba',    size:'≈ 150 × 120 cm', vis:6, tam:9, cuadro:7},
+  {id:'puerta-di',  name:'Puerta delantera izquierda',      en:'Front left door',        price:9500,  zone:'Lado izq.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
+  {id:'puerta-ti',  name:'Puerta trasera izquierda',        en:'Rear left door',         price:10500, zone:'Lado izq.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
+  {id:'vidrio-ti',  name:'Ventana trasera izquierda',       en:'Rear left window',       price:7500,  zone:'Lado izq.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true, microperf:true},
+  {id:'salpi-i',    name:'Salpicadera delantera izquierda', en:'Front left fender',      price:7500,  zone:'Lado izq.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6},
+  {id:'puerta-dd',  name:'Puerta delantera derecha',        en:'Front right door',       price:9500,  zone:'Lado der.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
+  {id:'puerta-td',  name:'Puerta trasera derecha',          en:'Rear right door',        price:10500, zone:'Lado der.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
+  {id:'vidrio-td',  name:'Ventana trasera derecha',         en:'Rear right window',      price:7500,  zone:'Lado der.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true, microperf:true},
+  {id:'salpi-d',    name:'Salpicadera delantera derecha',   en:'Front right fender',     price:7500,  zone:'Lado der.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6},
+  {id:'porton',     name:'Portón trasero',                  en:'Tailgate',               price:12000, zone:'Atrás',     size:'≈ 120 × 45 cm',  vis:8, tam:6, cuadro:7},
+  {id:'medallon',   name:'Medallón (vidrio trasero)',       en:'Rear window',            price:12000, zone:'Atrás',     size:'≈ 95 × 45 cm',   vis:8, tam:5, cuadro:7, glass:true, microperf:true},
+  {id:'defensa-t',  name:'Defensa trasera',                 en:'Rear bumper',            price:8000,  zone:'Atrás',     size:'≈ 160 × 25 cm',  vis:8, tam:3, cuadro:6},
 ];
+export const PARTS: Part[] = RAW.map(p => ({ mp: '', stripe: '', ...p, usd: usdOf(p.price) }));
 
 export const ZONES: Zone[] = ['Frente', 'Arriba', 'Lado izq.', 'Lado der.', 'Atrás'];
 export const ZONE_EN: Record<Zone, string> = {'Frente':'Front','Arriba':'Top','Lado izq.':'Left side','Lado der.':'Right side','Atrás':'Rear'};
@@ -44,11 +52,20 @@ export const ZONE_EN: Record<Zone, string> = {'Frente':'Front','Arriba':'Top','L
 export const ORDER: Part[] = ZONES.flatMap(z => PARTS.filter(p => p.zone === z));
 export const PART_BY_ID: Record<string, Part> = Object.fromEntries(PARTS.map(p => [p.id, p]));
 
+export interface Invoice { rfc: string; razon: string; regimen: string; cp: string; uso: string }
 export interface Sale {
   brand: string;
   color: string;
   /** logo subido en el checkout (solo en memoria) */
   img?: HTMLImageElement | null;
+  email?: string;
+  link?: string;
+  /** datos para la factura, si la pidió */
+  invoice?: Invoice | null;
+  /** aceptó recibir noticias (finalidad secundaria del aviso de privacidad) */
+  news?: boolean;
+  /** cuándo aceptó términos y aviso */
+  acceptedAt?: string;
 }
 export type SoldMap = Record<string, Sale>;
 

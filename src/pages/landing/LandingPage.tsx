@@ -1,10 +1,12 @@
 import { useEffect, useLayoutEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useDoor } from '../../app/door';
+import { Footer } from '../../components/Footer';
 import { Graffiti } from '../../components/Graffiti';
 import { Header } from '../../components/Header';
 import { Ticker } from '../../components/Ticker';
 import { useLocale } from '../../state/locale';
+import { Budget } from './sections/Budget';
 import { Faq } from './sections/Faq';
 import { Hero } from './sections/Hero';
 import { HowItWorks } from './sections/HowItWorks';
@@ -15,8 +17,8 @@ import { Where } from './sections/Where';
 import '../../styles/landing.css';
 
 const NAMES = {
-  es: { inicio: 'La portada', nota: 'La nota', garage: 'El garage', donde: 'Dónde lo vas a ver', como: 'Cómo funciona', dudas: 'Dudas' },
-  en: { inicio: 'The front page', nota: 'The story', garage: 'The garage', donde: 'Where you’ll see it', como: 'How it works', dudas: 'FAQ' },
+  es: { inicio: 'La portada', nota: 'La nota', garage: 'El garage', donde: 'Dónde lo vas a ver', como: 'Cómo funciona', dudas: 'Dudas', presupuesto: 'El presupuesto' },
+  en: { inicio: 'The front page', nota: 'The story', garage: 'The garage', donde: 'Where you’ll see it', como: 'How it works', dudas: 'FAQ', presupuesto: 'The budget' },
 } as const;
 
 /* the garage page is its own chunk: start fetching it while the visitor is still reading */
@@ -74,9 +76,10 @@ export function LandingPage() {
         <div className="checker" aria-hidden="true" style={{ transform: 'rotate(.5deg)' }} />
         <Where />
         <News />
+        <Budget />
         <Faq />
       </main>
-      <footer><div className="wrap"><span>{t('foot.1')}</span><span>{t('foot.2')}</span></div></footer>
+      <Footer />
     </>
   );
 }
