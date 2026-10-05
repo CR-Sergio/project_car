@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { PAY_MODE } from '../../data/config';
-import { PART_BY_ID } from '../../data/parts';
+import { NAME_MAX, NAME_RE, PART_BY_ID, cleanName } from '../../data/parts';
 import { brandCanvas } from '../../lib/brandCanvas';
+import { namesCanvas } from '../../lib/namesCanvas';
 import { escapeHtml } from '../../lib/format';
 import { confetti } from '../../lib/confetti';
 import { useToast } from '../../app/toast';
@@ -11,12 +12,14 @@ import '../../styles/checkout.css';
 
 type Step = { kind: 'form' } | { kind: 'redirect'; url: string; via: string } | { kind: 'done'; brand: string; via: string };
 
-/** Buy a part: brand, color, email, optional logo, payment method. In test mode the payment is simulated. */
+/** Buy a part (brand, color, email, optional logo) or a name on the supporters' roof (name, email).
+    In test mode the payment is simulated. */
 export function CheckoutModal({ partId, onClose }: { partId: string; onClose: () => void }) {
   const { t, cur, nameOf, money, priceOf } = useLocale();
-  const { markSold } = useSales();
+  const { markSold, supporters, addSupporter } = useSales();
   const toast = useToast();
-  const p = PART_BY_ID[partId], usd = cur === 'USD';
+  const p = PART_BY_ID[partId], usd = cur === 'USD', isNames = p.kind === 'names';
+  const [who, setWho] = useState(''), [consent, setConsent] = useState(false);
   const [step, setStep] = useState<Step>({ kind: 'form' });
   const [brand, setBrand] = useState(''), [color, setColor] = useState('#2f6fe0'), [email, setEmail] = useState(''), [link, setLink] = useState('');
   const [logo, setLogo] = useState<HTMLImageElement | null>(null);
@@ -44,8 +47,12 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
 
   useEffect(() => {
     const c = pv.current; if (!c) return;
-    c.getContext('2d')!.drawImage(brandCanvas({ brand: brand || t('yourBrand'), color, img: logo }, 320, 160), 0, 0);
-  }, [brand, color, logo, t, step]);
+    const g = c.getContext('2d')!;
+    if (isNames) {
+      const mine = cleanName(who) || t('yourName');
+      g.drawImage(namesCanvas([...supporters.slice(-11).map(x => x.name), mine], 12, 320, 160, 'LOS QUE SE SUBIERON', mine), 0, 0);
+    } else g.drawImage(brandCanvas({ brand: brand || t('yourBrand'), color, img: logo }, 320, 160), 0, 0);
+  }, [brand, color, logo, t, step, isNames, who, supporters]);
   useEffect(() => { if (step.kind === 'done') ok.current?.focus(); }, [step]);
 
   function pickLogo(f: File | undefined) {
@@ -55,11 +62,13 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    const b = brand.trim(), m = email.trim();
-    if (!b) return setErr(t('errBrand'));
+    const b = isNames ? cleanName(who) : brand.trim(), m = email.trim();
+    if (isNames && (!b || b.length > NAME_MAX || !NAME_RE.test(b))) return setErr(t('errName', { max: NAME_MAX }));
+    if (!isNames && !b) return setErr(t('errBrand'));
     if (!/^\S+@\S+\.\S+$/.test(m)) return setErr(t('errEmail'));
     if (!accepted) return setErr(t('errAccept'));
     if (!finalSale) return setErr(t('errRefund'));
+    if (isNames && !consent) return setErr(t('errNameConsent'));
     const via = method === 'mp' ? 'Mercado Pago' : 'Stripe';
     if (PAY_MODE === 'live') {
       const url = usd && p.stripeUsd ? p.stripeUsd : p[method];
@@ -68,8 +77,10 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
     }
     setProcessing(true);
     setTimeout(() => {
-      markSold(partId, { brand: b, color, img: logo, email: m, link: link.trim(), news: !noNews, acceptedAt: new Date().toISOString() });
-      setStep({ kind: 'done', brand: b, via }); confetti(color); toast(t('toast'));
+      const acceptedAt = new Date().toISOString();
+      if (isNames) addSupporter({ name: b, email: m, news: !noNews, acceptedAt });
+      else markSold(partId, { brand: b, color, img: logo, email: m, link: link.trim(), news: !noNews, acceptedAt });
+      setStep({ kind: 'done', brand: b, via }); confetti(isNames ? '#f1c232' : color); if (!isNames) toast(t('toast'));
     }, 1100);
   }
 
@@ -81,15 +92,21 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
         )}
         {step.kind === 'done' && (
           <div className="done">
-            <div className="big">{t('yours')}</div>
-            <p><span dangerouslySetInnerHTML={{ __html: t('nowHas', { part: escapeHtml(nameOf(p)), b: escapeHtml(step.brand) }) }} /><br />{t('simulated', { x: step.via })}</p>
+            <div className="big">{isNames ? t('yoursName') : t('yours')}</div>
+            <p><span dangerouslySetInnerHTML={{ __html: isNames ? t('nowName', { b: escapeHtml(step.brand) }) : t('nowHas', { part: escapeHtml(nameOf(p)), b: escapeHtml(step.brand) }) }} /><br />{t('simulated', { x: step.via })}</p>
             <button className="btn" ref={ok} onClick={onClose}>{t('seeMine')}</button>
           </div>
         )}
         {step.kind === 'form' && <>
-          <h3 id="mTitle">{nameOf(p)}</h3><p className="sub">{money(total)} {cur} · {t('priceFinal')} · {p.size}</p>
+          <h3 id="mTitle">{nameOf(p)}</h3><p className="sub">{money(total)} {cur}{isNames ? ' ' + t('eachName') : ''} · {t('priceFinal')}{isNames ? '' : ' · ' + p.size}</p>
           {PAY_MODE === 'test' && <p className="testbar">{t('test')}</p>}
           <form noValidate onSubmit={submit}>
+            {isNames ? <>
+            <div className="field"><label htmlFor="f-name">{t('nameLabel')}</label><input ref={first} type="text" id="f-name" maxLength={NAME_MAX} required placeholder={t('namePh')} value={who} onChange={e => setWho(e.target.value)} /></div>
+            <p className="fine">{t('nameHelp', { max: NAME_MAX })}</p>
+            <div className="field"><label htmlFor="f-email">{t('email')}</label><input type="email" id="f-email" required placeholder="tu@correo.com" value={email} onChange={e => setEmail(e.target.value)} /></div>
+            <div className="preview"><canvas ref={pv} width={320} height={160} /><span>{t('namePreview')}</span></div>
+            </> : <>
             <div className="row2">
               <div className="field"><label htmlFor="f-brand">{t('brand')}</label><input ref={first} type="text" id="f-brand" maxLength={40} required placeholder={t('brandPh')} value={brand} onChange={e => setBrand(e.target.value)} /></div>
               <div className="field"><label htmlFor="f-color">{t('color')}</label><input type="color" id="f-color" value={color} onChange={e => setColor(e.target.value)} /></div>
@@ -98,16 +115,18 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
             <div className="field"><label htmlFor="f-link">{t('link')}</label><input type="url" id="f-link" placeholder="https://" value={link} onChange={e => setLink(e.target.value)} /></div>
             <div className="field"><label htmlFor="f-logo">{t('logo')}</label><input type="file" id="f-logo" accept="image/png,image/jpeg,image/webp" onChange={e => pickLogo(e.target.files?.[0])} /></div>
             <div className="preview"><canvas ref={pv} width={320} height={160} /><span>{t('preview')}</span></div>
+            </>}
             <span className="legend-label">{t('payWith')}</span>
             <div className="pay">
               {!usd && <label><input type="radio" name="pm" value="mp" checked={method === 'mp'} onChange={() => setMethod('mp')} /> Mercado Pago</label>}
               <label><input type="radio" name="pm" value="stripe" checked={method === 'stripe'} onChange={() => setMethod('stripe')} /> Stripe</label>
             </div>
             {usd && <p className="sub">{t('usdNote')}</p>}
-            <label className="check"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t('accept') }} /></label>
-            <label className="check"><input type="checkbox" checked={finalSale} onChange={e => setFinalSale(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t('noRefund') }} /></label>
+            <label className="check"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t(isNames ? 'acceptName' : 'accept') }} /></label>
+            <label className="check"><input type="checkbox" checked={finalSale} onChange={e => setFinalSale(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t(isNames ? 'noRefundName' : 'noRefund') }} /></label>
+            {isNames && <label className="check"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> {t('nameConsent')}</label>}
             <label className="check"><input type="checkbox" checked={noNews} onChange={e => setNoNews(e.target.checked)} /> {t('noNews')}</label>
-            <p className="fine">{t('privacyShort', { who: 'Proyect Car' })} {t('restrictedNote')}</p>
+            <p className="fine">{t('privacyShort', { who: 'Proyect Car' })}{isNames ? '' : ' ' + t('restrictedNote')}</p>
             <p className="err">{err}</p>
             <div className="actions">
               <button type="button" className="linkbtn" onClick={onClose}>{t('cancel')}</button>

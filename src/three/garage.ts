@@ -3,10 +3,10 @@ import { PART_BY_ID, type SoldMap } from '../data/parts';
 import { GOAL_MXN } from '../data/config';
 import { REDUCED } from '../lib/motion';
 import { loadPalio } from './model';
-import { paintAll, pulseSelected, setSelected, setSold } from './paint';
+import { paintAll, pulseSelected, setNames, setSelected, setSold } from './paint';
 import { Viewer, checkerTexture } from './viewer';
 
-export interface GarageHandle { select: (id: string) => void; setSold: (s: SoldMap) => void; resize: () => void; dispose: () => void }
+export interface GarageHandle { select: (id: string) => void; setSold: (s: SoldMap) => void; setNames: (n: string[]) => void; resize: () => void; dispose: () => void }
 interface Opts { onPart: (id: string) => void; onLoaded: () => void; onError: () => void }
 
 /* fonts painted into canvas textures (neon signs, posters, floor number) must be loaded before drawing */
@@ -20,8 +20,8 @@ function canvasFonts() {
 const VIEWS: Record<string, [number, number, number]> = { 'Frente':[4.4,1.55,3.0], 'Atrás':[-4.4,1.6,-3.0], 'Arriba':[3.2,4.3,3.6], 'Lado izq.':[1.0,1.35,-5.4], 'Lado der.':[1.0,1.35,5.4] };
 
 /** The game-style garage: full-screen scene, glossy floor with a faked reflection, props, neon, a flying camera. */
-export function createGarage(host: HTMLElement, sold: SoldMap, { onPart, onLoaded, onError }: Opts): GarageHandle {
-  setSold(sold);
+export function createGarage(host: HTMLElement, sold: SoldMap, names: string[], { onPart, onLoaded, onError }: Opts): GarageHandle {
+  setSold(sold); setNames(names);
   const gar = new Viewer(host, { fov: 36, pos: [5.6, 1.8, 4.2], target: [0, .62, 0], minD: 3.2, maxD: 12 });
   const gs = gar.scene; gar.liftOnNarrow = true; gar.resize();
   let disposed = false;
@@ -208,7 +208,7 @@ export function createGarage(host: HTMLElement, sold: SoldMap, { onPart, onLoade
 
   return {
     select(id) { setSelected(id); flyTo(id); },
-    setSold,
+    setSold, setNames,
     resize: () => gar.resize(),
     dispose() { disposed = true; document.removeEventListener('visibilitychange', sync); gar.dispose(); },
   };

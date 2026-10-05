@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import { PALIO_ASPECT, PARTS, type SoldMap } from '../data/parts';
+import { NAMES_CAPACITY, PALIO_ASPECT, PARTS, PART_BY_ID, type SoldMap } from '../data/parts';
 import { brandCanvas } from '../lib/brandCanvas';
+import { namesCanvas } from '../lib/namesCanvas';
 
 /* Shared materials: the showroom and the garage paint the very same parts, so a sale shows up in both. */
 export const MATS: Record<string, THREE.MeshStandardMaterial> = {
@@ -25,13 +26,17 @@ for (const p of PARTS) panels[p.id] = {
 };
 
 /* what the parts show: sales, the part picked in the garage, the part under the mouse */
-const state: { sold: SoldMap; selected: string | null; hovered: string | null } = { sold: {}, selected: null, hovered: null };
+const state: { sold: SoldMap; names: string[]; selected: string | null; hovered: string | null } = { sold: {}, names: [], selected: null, hovered: null };
 export const paintState = state as Readonly<typeof state>;
 
 export function paint(id: string) {
   const P = panels[id]; if (!P) return; const m = P.mat, s = state.sold[id];
   if (m.map) { m.map.dispose(); m.map = null; }
-  if (s) {
+  if (PART_BY_ID[id]?.kind === 'names') {
+    // the supporters' roof always shows its sheet of names (hi-res: the letters are small)
+    const a = Math.max(.5, Math.min(7, P.aspect)), tex = new THREE.CanvasTexture(namesCanvas(state.names, NAMES_CAPACITY, 1024, Math.round(1024 / a)));
+    tex.colorSpace = THREE.SRGBColorSpace; tex.flipY = false; tex.anisotropy = 8; m.map = tex; m.color.set(0xffffff);
+  } else if (s) {
     const a = Math.max(.5, Math.min(7, P.aspect)); const tex = new THREE.CanvasTexture(brandCanvas(s, 512, Math.round(512 / a)));
     tex.colorSpace = THREE.SRGBColorSpace; tex.flipY = false; m.map = tex; m.color.set(0xffffff);
   } else m.color.copy(id === state.selected ? SEL : P.free);
@@ -43,6 +48,10 @@ export const paintAll = () => PARTS.forEach(p => paint(p.id));
 export function setSold(sold: SoldMap) {
   const changed = PARTS.filter(p => state.sold[p.id] !== sold[p.id]).map(p => p.id);
   state.sold = sold; changed.forEach(paint);
+}
+export function setNames(names: string[]) {
+  if (names.length === state.names.length && names.every((n, i) => n === state.names[i])) return;
+  state.names = names; PARTS.filter(p => p.kind === 'names').forEach(p => paint(p.id));
 }
 export function setSelected(id: string | null) {
   const prev = state.selected; if (prev === id) return;

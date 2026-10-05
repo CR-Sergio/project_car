@@ -22,6 +22,8 @@ export interface Part {
   tam: number;
   cuadro: number;
   glass?: boolean;
+  /** 'names': no se vende a una marca; cada persona compra un nombre (el techo) */
+  kind?: 'names';
 }
 
 type PartInput = Omit<Part, 'usd' | 'mp' | 'stripe'> & Partial<Pick<Part, 'mp' | 'stripe'>>;
@@ -29,7 +31,7 @@ const RAW: PartInput[] = [
   {id:'cofre',      name:'Cofre',                           en:'Hood',                   price:18000, zone:'Frente',    size:'≈ 115 × 150 cm', vis:9, tam:8, cuadro:9},
   {id:'parabrisas', name:'Franja del parabrisas',           en:'Windshield banner',      price:13000, zone:'Frente',    size:'≈ 130 × 20 cm',  vis:9, tam:4, cuadro:9, glass:true},
   {id:'defensa-d',  name:'Defensa delantera',               en:'Front bumper',           price:8000,  zone:'Frente',    size:'≈ 160 × 25 cm',  vis:7, tam:3, cuadro:6},
-  {id:'techo',      name:'Techo',                           en:'Roof',                   price:18000, zone:'Arriba',    size:'≈ 150 × 120 cm', vis:6, tam:9, cuadro:7},
+  {id:'techo',      name:'Techo de la raza',                en:'Supporters’ roof',       price:100,   zone:'Arriba',    size:'≈ 150 × 120 cm', vis:6, tam:9, cuadro:7, kind:'names'},
   {id:'puerta-di',  name:'Puerta delantera izquierda',      en:'Front left door',        price:9500,  zone:'Lado izq.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
   {id:'puerta-ti',  name:'Puerta trasera izquierda',        en:'Rear left door',         price:10500, zone:'Lado izq.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
   {id:'vidrio-ti',  name:'Ventana trasera izquierda',       en:'Rear left window',       price:7500,  zone:'Lado izq.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true},
@@ -49,6 +51,31 @@ export const ZONE_EN: Record<Zone, string> = {'Frente':'Front','Arriba':'Top','L
 /** order used by the garage menu and the prev/next arrows */
 export const ORDER: Part[] = ZONES.flatMap(z => PARTS.filter(p => p.zone === z));
 export const PART_BY_ID: Record<string, Part> = Object.fromEntries(PARTS.map(p => [p.id, p]));
+/** las piezas que se venden a marcas (todas menos el techo de nombres) */
+export const BRAND_PARTS = PARTS.filter(p => p.kind !== 'names');
+
+/* ===================== TECHO DE LA RAZA =====================
+   El techo no se vende a una marca: cada seguidor compra un lugar para su nombre, al precio del techo en PARTS. */
+export const NAMES_PART_ID = 'techo';
+/** cuántos nombres caben en el techo (≈150 × 120 cm, letras de ≈4 cm) */
+export const NAMES_CAPACITY = 300;
+/** largo máximo de cada nombre */
+export const NAME_MAX = 22;
+
+export interface Supporter {
+  name: string;
+  email?: string;
+  news?: boolean;
+  acceptedAt?: string;
+}
+/* Nombres de EJEMPLO para ver cómo se ve el techo. Bórralos al lanzar. */
+export const EXAMPLE_SUPPORTERS: Supporter[] = [
+  'Doña Lupe', 'El Primo', '@mau.mty', 'Fer y Caro', 'Tío Beto', 'La Güera', 'Chuy 81', 'Los del 13', 'Rafa G.', 'Mamá',
+  'Pollo', 'Toño Garza', '@regio.motors', 'Abuelo Chema', 'Dani', 'El Flaco', 'Sofi', 'Memo y Ana', 'Charly', 'Nacho',
+].map(name => ({ name }));
+/** nombres válidos: letras, números, espacios y . , ' & @ _ - */
+export const NAME_RE = /^[\p{L}\p{N} .,'&@_-]+$/u;
+export function cleanName(raw: string) { return raw.replace(/\s+/g, ' ').trim(); }
 
 export interface Sale {
   brand: string;
@@ -66,7 +93,6 @@ export type SoldMap = Record<string, Sale>;
 
 /* Ventas de EJEMPLO para ver cómo se ve una pieza vendida. Bórralas al lanzar. */
 export const EXAMPLE_SOLD: SoldMap = {
-  'techo':     {brand:'Marca ejemplo', color:'#f1c232'},
   'puerta-dd': {brand:'Llantera Demo', color:'#2f6fe0'},
   'defensa-d': {brand:'Taller Demo',   color:'#e2252e'},
 };

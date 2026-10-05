@@ -1,12 +1,13 @@
 import { Link } from 'react-router';
 import { LEGAL, RESTRICTED } from '../../data/legal';
+import { NAME_MAX, NAMES_CAPACITY, NAMES_PART_ID, PART_BY_ID } from '../../data/parts';
 import { LegalLayout, V } from './LegalLayout';
 
 /* Términos y Condiciones de contratación de espacio publicitario.
    Escritos con base en contratos de publicidad en vehículos y de patrocinio que ya se usan en el mercado,
    ajustados a la ley mexicana. Base para que la revise un abogado antes de cobrar. */
 export default function TermsPage() {
-  const L = LEGAL;
+  const L = LEGAL, roofPrice = PART_BY_ID[NAMES_PART_ID].price.toLocaleString('es-MX');
   let n = 0; const H = ({ children }: { children: string }) => <h2><span className="n">{++n}.</span>{children}</h2>;
   return (
     <LegalLayout title="TERMINOS Y CONDICIONES" titleEn="TERMS AND CONDITIONS" seed={43} stamp="LÉASE CON CALMA">
@@ -26,6 +27,7 @@ export default function TermsPage() {
       <ul>
         <li><strong>Vehículo:</strong> el Fiat Palio 2013 del proyecto, propiedad de Proyect Car.</li>
         <li><strong>Pieza:</strong> la parte del Vehículo que eliges (cofre, puerta, ventana, etc.) y su área aproximada indicada en el sitio.</li>
+        <li><strong>Techo de la raza:</strong> el techo del Vehículo, que no se vende a marcas: en él se rotulan nombres de personas que apoyan el proyecto (cláusula 13). Comprar un lugar ahí es comprar un <strong>Nombre</strong>.</li>
         <li><strong>Servicio:</strong> apartar la Pieza para tu marca, diseñar el arte sobre ella, imprimir e instalar el vinil, mostrarlo durante la Vigencia y retirarlo al final.</li>
         <li><strong>Vigencia:</strong> el tiempo que tu vinil se queda instalado (cláusula 8).</li>
         <li><strong>Contenido:</strong> los videos, fotos y publicaciones del proyecto en el sitio y en redes sociales.</li>
@@ -130,6 +132,18 @@ export default function TermsPage() {
         <li>El Vehículo es y sigue siendo nuestro. Decidimos su uso, mantenimiento y reparaciones. Puede estar fuera de circulación temporalmente (taller, trámites, verificaciones) sin que eso cambie la Vigencia.</li>
         <li>El vinil es un material temporal y <strong>no tiene garantía de duración</strong>: el sol, la lluvia, los lavados y el uso normal lo desgastan. Si se daña por vandalismo o accidente, podemos repararlo o reponerlo a nuestro criterio, sin obligación.</li>
         <li>Si el Vehículo sufre un siniestro, robo o pérdida total, o deja de poder circular por causas ajenas a nosotros, a nuestra elección podemos rotular tu marca en otro vehículo del proyecto por el resto de la Vigencia, o seguir mostrándola en el Contenido por ese mismo tiempo. Esto no da lugar a reembolso.</li>
+      </ul>
+
+      <H>Nombres en el techo</H>
+      <p>Si compras un Nombre en el Techo de la raza, además de lo anterior aplica lo siguiente:</p>
+      <ul>
+        <li>Cada Nombre cuesta ${roofPrice} pesos, precio final, y es un servicio: rotular un nombre en el techo y mostrarlo en el Contenido. No es una donación ni da derecho a nada más.</li>
+        <li>El Nombre puede ser el nombre, apodo o usuario de redes de una persona, de hasta {NAME_MAX} caracteres. No se aceptan marcas ni negocios (para eso están las Piezas), groserías, insultos, contenido político, sexual o discriminatorio, ni datos personales como teléfonos o direcciones.</li>
+        <li>Si el Nombre no es el tuyo, declaras que tienes permiso de esa persona para publicarlo; si es menor de edad, el permiso de quien ejerza la patria potestad. Respondes por cualquier reclamo de esa persona.</li>
+        <li>Podemos abreviar o ajustar la ortografía del Nombre para que quepa y se lea. Si no lo aceptamos, puedes proponer otro dentro de 10 días hábiles; si tampoco procede, te devolvemos lo pagado menos la comisión de la pasarela.</li>
+        <li>Caben hasta {NAMES_CAPACITY} Nombres. Los rotulamos por tandas, al menos una vez al mes mientras haya Nombres pendientes, y nosotros decidimos el lugar, tamaño, color y tipo de letra de cada uno. Las letras son chicas: no garantizamos que tu Nombre se lea en todos los videos o tomas.</li>
+        <li>Tu Nombre se queda en el techo al menos {L.vigenciaMeses} meses desde que se instala su tanda, y también aparece en la lista de nombres del sitio. Al terminar podemos retirarlo o dejarlo, sin obligación.</li>
+        <li>Puedes comprar varios Nombres; cada uno se paga por separado. Todas las compras de Nombres son finales, conforme a la cláusula 7.</li>
       </ul>
 
       <H>Caso fortuito, fuerza mayor y plataformas</H>

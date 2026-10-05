@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { PARTS } from '../../../data/parts';
+import { BRAND_PARTS } from '../../../data/parts';
 import { REDUCED } from '../../../lib/motion';
 import { useLocale } from '../../../state/locale';
 import { useSales } from '../../../state/sales';
@@ -9,8 +9,8 @@ let shown = 0, shownCur: string | null = null;
 
 export function Meter() {
   const { t, money, goal, cur } = useLocale();
-  const { sold, raisedIn } = useSales();
-  const raised = raisedIn(cur), pct = Math.min(100, raised / goal * 100), n = Object.keys(sold).length, N = PARTS.length;
+  const { sold, supporters, raisedIn } = useSales();
+  const raised = raisedIn(cur), pct = Math.min(100, raised / goal * 100), n = Object.keys(sold).length, N = BRAND_PARTS.length;
   const num = useRef<HTMLSpanElement>(null);
   const fill = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -30,7 +30,7 @@ export function Meter() {
     <div className="meter paper" role="group" aria-label="Avance de la meta">
       <div className="meter-head">
         <div className="big"><span ref={num}>{money(shown)}</span> <small>/ {money(goal)} {cur}</small></div>
-        <div className="meta"><span>{pct.toFixed(0)}%</span> · <span>{t('soldOf', { n, N })}</span></div>
+        <div className="meta"><span>{pct.toFixed(0)}%</span> · <span>{t('soldOf', { n, N })}</span> · <span>{t('namesCount', { k: supporters.length })}</span></div>
       </div>
       <div className="track"><div className="fill" ref={fill}><span className="car" aria-hidden="true">🏎️</span></div><div className="flag" aria-hidden="true" /></div>
       <div className="ticks" aria-hidden="true">

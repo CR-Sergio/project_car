@@ -196,3 +196,10 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
 .show-bar .legend{margin:0}
 
 footer .foot-links a{color:var(--paper-2)}
+/* ---------- the supporters' roof, listed under the turntable ---------- */
+.roof-wall{position:relative;margin:-14px 0 46px;background-color:var(--paper);color:var(--ink);padding:20px 22px 22px;rotate:-.5deg;box-shadow:6px 7px 0 rgba(0,0,0,.45)}
+.roof-wall .tape{left:24px;transform:rotate(-5deg);width:90px}
+.rw-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 18px;border-bottom:3px solid var(--tape);padding-bottom:8px;margin-bottom:12px}
+.rw-head h3{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.1;margin:0}
+.rw-head span{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#5b5560}
+.rw-names{font-family:'Permanent Marker',cursive;font-size:18px;line-height:1.55;margin:0 0 16px;max-height:9.3em;overflow:auto;overflow-wrap:anywhere}
