@@ -13,7 +13,7 @@ La página ya **no habla de IVA ni de factura**: los precios son finales. Aun as
 
 ### Números internos (no se muestran en la página)
 
-Meta pública: **$150,000 MXN**. Las 14 piezas para marcas suman $141,000; el techo lleno (300 nombres × $100) agrega hasta $30,000. Para llegar a la meta vendiendo todas las piezas hacen falta 90 nombres.
+Meta pública: **$150,000 MXN**. Las 12 piezas para marcas suman $126,000; las salpicaderas llenas (≈170 mensajes × $100) agregan hasta $17,000. **Vendiendo todo se llega a ≈$143,000: faltan ≈$7,000 para la meta** (ver opciones en la conversación: subir algo las piezas, un mensaje XL o patrocinios por nivel).
 
 | Concepto | Estimado |
 |---|---|
@@ -22,7 +22,7 @@ Meta pública: **$150,000 MXN**. Las 14 piezas para marcas suman $141,000; el te
 | **Te quedaría para el carro, vendiendo $150,000** | **≈ $127,000** antes de impuestos |
 
 Vinil por pieza: cofre $2,450 · techo de nombres $2,550 por plancha · franja del parabrisas $750 · defensas $900 c/u · puertas delanteras $1,050 c/u ·
-puertas traseras (con costado) $1,300 c/u · ventanas traseras $750 c/u · salpicaderas $950 c/u · portón $1,050 · medallón $850.
+puertas traseras (con costado) $1,300 c/u · ventanas traseras $750 c/u · salpicaderas (planchas de mensajes) $950 c/u · portón $1,050 · medallón $850.
 Cotiza con 2 o 3 talleres para confirmarlo.
 
 ## 2. Textos legales en la página
@@ -43,13 +43,13 @@ Cotiza con 2 o 3 talleres para confirmarlo.
 - [ ] Antes de lanzar, borrar las ventas de ejemplo (`EXAMPLE_SOLD` en `src/data/parts.ts`) y cambiar el pie de página de "página de prueba".
 - [ ] Siguiente paso técnico: backend con webhook para marcar piezas vendidas, apartar la pieza mientras alguien paga y guardar los datos del checkout (hoy se pierden al recargar).
 
-## 4. Techo de la raza (nombres a $100)
+## 4. Mensajes de la raza (salpicaderas a $100) y nombres en el techo
 
-- [ ] Antes de cobrar en real, el techo **necesita el backend**: con un Payment Link fijo el nombre que escribe la persona no te llega. Opciones rápidas: un formulario (Google Forms / Tally) que pida nombre + folio del pago, o el webhook de la pasarela.
-- [ ] Revisar cada nombre antes de imprimir (sin marcas, groserías, política ni datos personales) y guardar el correo de confirmación.
-- [ ] Imprimir por tandas, al menos una vez al mes mientras haya nombres pendientes (así lo dicen los términos, cláusula 13). Lo más barato es vinil de corte o impresión de una plancha nueva del techo cada tanda; cotízalo.
-- [ ] Ojo con la comisión: en $100 la pasarela se lleva ≈$7 (≈7%). Si quieres, ofrece paquetes (3 nombres por $250) para bajarla.
-- [ ] Borrar `EXAMPLE_SUPPORTERS` en `src/data/parts.ts` antes de lanzar.
+- [ ] Antes de cobrar en real, los mensajes **necesitan el backend**: con un Payment Link fijo, el mensaje y el nombre que escribe la persona no te llegan. Opción rápida: un formulario (Tally / Google Forms) que pida mensaje, nombre para el techo y folio del pago; o el webhook de la pasarela.
+- [ ] Revisar cada mensaje y nombre antes de imprimir (sin marcas, anuncios, links, groserías, política ni datos personales) y guardar el correo de confirmación.
+- [ ] Imprimir por tandas, al menos una vez al mes mientras haya pendientes (cláusula 13). Caben ≈85 mensajes por salpicadera con letras de 1.5-2 cm; vinil de corte o impresión de plancha nueva por tanda: cotízalo.
+- [ ] Ojo con la comisión: en $100 la pasarela se lleva ≈$7 (≈7%).
+- [ ] Borrar `EXAMPLE_MESSAGES` en `src/data/parts.ts` antes de lanzar.
 
 ## 5. El carro en la calle
 

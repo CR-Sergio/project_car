@@ -65,7 +65,7 @@ src/
 - `src/data/parts.ts`
   - `PARTS`: piezas, precio final en MXN (`price`; el de USD se calcula con el tipo de cambio de `src/data/currency.ts`), zona, medidas del vinil, barras del garage (`vis`, `tam`, `cuadro`) y links de pago (`mp`, `stripe`, `stripeUsd`).
   - `EXAMPLE_SOLD`: ventas de **ejemplo** para ver cómo se ven las piezas vendidas. Bórralas antes de lanzar.
-  - **Techo de la raza**: el techo no se vende a marcas. Cada persona compra un lugar para su nombre al precio del techo en `PARTS` ($100). `NAMES_CAPACITY` (300) y `NAME_MAX` (22 caracteres) controlan cuántos caben y qué tan largos. `EXAMPLE_SUPPORTERS` son nombres de **ejemplo**: bórralos antes de lanzar.
+  - **Mensajes de la raza**: las salpicaderas delanteras no se venden a marcas. Cada persona compra un mensaje de hasta `MESSAGE_MAX` (24) caracteres al precio de la salpicadera en `PARTS` ($100); caben `MESSAGES_PER_PART` (85) por lado, ≈170 en total. De regalo, su nombre va en el **techo**, que ya no se vende. `EXAMPLE_MESSAGES` son mensajes de **ejemplo**: bórralos antes de lanzar.
 - `src/data/config.ts`: `PAY_MODE` (`'test'` simula el pago), la meta (`GOAL_MXN`, $150,000) y la ruta del modelo.
 - `src/data/legal.ts`: **datos legales**. Tu nombre, domicilio y correo (mientras falten, las páginas legales los marcan en amarillo), vigencia (6 meses), videos mínimos, plazos del servicio y marcas no aceptadas.
 - `src/i18n/strings.ts`: textos en español (`es`) e inglés (`en`).
@@ -73,7 +73,7 @@ src/
 
 ### Piezas y modelo 3D
 
-Son 14 piezas para marcas más el techo de nombres. Los costados traseros ya no se venden solos: van incluidos en las puertas traseras. En su lugar se venden las dos ventanas traseras (las de las puertas de atrás). El archivo `palio.glb` no cambió; al cargarlo, `src/three/remap.ts` junta cada costado con su puerta y recorta las ventanas traseras de la malla de vidrio, para que el logo de cada pieza cubra toda su superficie. También voltea el UV del cofre y del techo, que venían al revés en el modelo (el logo se veía en espejo).
+Son 12 piezas para marcas, 2 salpicaderas de mensajes y el techo con los nombres de regalo. Los costados traseros ya no se venden solos: van incluidos en las puertas traseras. En su lugar se venden las dos ventanas traseras (las de las puertas de atrás). El archivo `palio.glb` no cambió; al cargarlo, `src/three/remap.ts` junta cada costado con su puerta y recorta las ventanas traseras de la malla de vidrio, para que el logo de cada pieza cubra toda su superficie. También voltea el UV del cofre y del techo, que venían al revés en el modelo (el logo se veía en espejo).
 
 Para cobrar de verdad:
 
