@@ -63,11 +63,10 @@ src/
 ## Configuración
 
 - `src/data/parts.ts`
-  - `PARTS`: piezas, precios en MXN **más IVA** (`price`; el de USD se calcula con el tipo de cambio), zona, medidas del vinil, barras del garage (`vis`, `tam`, `cuadro`) y links de pago (`mp`, `stripe`, `stripeUsd`).
+  - `PARTS`: piezas, precio final en MXN (`price`; el de USD se calcula con el tipo de cambio de `src/data/currency.ts`), zona, medidas del vinil, barras del garage (`vis`, `tam`, `cuadro`) y links de pago (`mp`, `stripe`, `stripeUsd`).
   - `EXAMPLE_SOLD`: ventas de **ejemplo** para ver cómo se ven las piezas vendidas. Bórralas antes de lanzar.
-- `src/data/config.ts`: `PAY_MODE` (`'test'` simula el pago) y la ruta del modelo.
-- `src/data/budget.ts`: **presupuesto**. Costo del project car, vinil (precio por m², merma, instalación, retiro), comisión de la pasarela, ISR de RESICO, gastos fijos y tipo de cambio. La meta se calcula sola (`src/lib/budget.ts`) y sale desglosada en la sección "¿A dónde va el dinero?".
-- `src/data/legal.ts`: **datos legales**. Tu nombre, RFC, domicilio y correo (mientras falten, las páginas legales los marcan en amarillo), vigencia, videos mínimos, plazos, marcas no aceptadas y regímenes fiscales del checkout.
+- `src/data/config.ts`: `PAY_MODE` (`'test'` simula el pago), la meta (`GOAL_MXN`, $150,000) y la ruta del modelo.
+- `src/data/legal.ts`: **datos legales**. Tu nombre, domicilio y correo (mientras falten, las páginas legales los marcan en amarillo), vigencia (6 meses), videos mínimos, plazos del servicio y marcas no aceptadas.
 - `src/i18n/strings.ts`: textos en español (`es`) e inglés (`en`).
 - **Foto de la portada**: `public/img/palio-foto.webp`, horizontal 13:9 (650 × 450 o más grande). Para cambiarla, reemplaza el archivo con el mismo nombre.
 
@@ -77,11 +76,11 @@ Son 15 piezas. Los costados traseros ya no se venden solos: van incluidos en las
 
 Para cobrar de verdad:
 
-1. Crea un Payment Link por pieza en Mercado Pago (`mp`) y/o Stripe (`stripe`; `stripeUsd` para cobrar en dólares), por el precio **con IVA**.
+1. Crea un Payment Link por pieza en Mercado Pago (`mp`) y/o Stripe (`stripe`; `stripeUsd` para cobrar en dólares), por el precio de la pieza.
 2. Pégalos en cada pieza de `PARTS` y cambia `PAY_MODE` a `'live'`.
 3. Para marcar piezas como vendidas automáticamente hace falta un backend con webhook (por ejemplo Supabase o Vercel Functions). En el código, `src/state/sales.tsx` es el único lugar que tendría que cambiar.
 
-Todo lo que hay que tener en regla fuera del código (SAT, seguro, vidrios, municipio, redes) está en [`docs/LANZAMIENTO.md`](docs/LANZAMIENTO.md).
+Todo lo que hay que tener en regla fuera del código (impuestos, evidencia de cada venta, seguro, vidrios, municipio, redes) está en [`docs/LANZAMIENTO.md`](docs/LANZAMIENTO.md).
 
 ## Rendimiento
 
