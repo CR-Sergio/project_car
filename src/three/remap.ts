@@ -57,3 +57,12 @@ export function sideUVs(geos: THREE.BufferGeometry[]) {
   }
   return w / h;
 }
+
+/** the hood and the roof come with their UVs upside down (the logo would read mirrored from outside):
+    flip them so the top of the logo points to the windshield and it reads from the front of the car */
+export const FLIP_V = ['cofre', 'techo'];
+export function flipV(geo: THREE.BufferGeometry) {
+  const uv = geo.getAttribute('uv'); if (!uv) return;
+  for (let i = 0; i < uv.count; i++) uv.setY(i, 1 - uv.getY(i));
+  uv.needsUpdate = true;
+}

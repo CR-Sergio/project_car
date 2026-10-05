@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { ALIASES, rearWindowOf, sideUVs, splitByTriangle } from './remap';
+import { ALIASES, flipV, rearWindowOf, sideUVs, splitByTriangle } from './remap';
 import { PART_BY_ID } from '../data/parts';
 
 describe('model remap for the current price list', () => {
@@ -32,5 +32,12 @@ describe('model remap for the current price list', () => {
     expect(left[0].getAttribute('uv').getX(1)).toBe(0);   // front edge (x = 1) starts the logo on the left side
     const right = [quad(0, 1, 1)]; sideUVs(right);
     expect(right[0].getAttribute('uv').getX(0)).toBe(0);  // right side: seen from outside the back is on the left, so the logo starts there
+  });
+  it('flips the hood/roof UVs vertically', () => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('uv', new THREE.Float32BufferAttribute([0, 0, 1, 0.25], 2));
+    flipV(g);
+    expect(g.getAttribute('uv').getY(0)).toBe(1);
+    expect(g.getAttribute('uv').getY(1)).toBe(0.75);
   });
 });

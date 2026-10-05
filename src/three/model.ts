@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MODEL_URL } from '../data/config';
 import { MATS, panels } from './paint';
-import { ALIASES, rearWindowOf, sideUVs, splitByTriangle } from './remap';
+import { ALIASES, FLIP_V, flipV, rearWindowOf, sideUVs, splitByTriangle } from './remap';
 
 /* The Palio is downloaded and prepared once per visit, then cloned into each viewer
    (clones share geometry and materials, so the second viewer costs almost nothing). */
@@ -31,6 +31,8 @@ function adapt(template: THREE.Group) {
     if (panels[key]) { o.material = panels[key].mat; o.userData.id = key; } else o.material = MATS[key] || MATS.body;
     o.castShadow = true; o.receiveShadow = true;
   }
+
+  for (const o of meshes) if (FLIP_V.includes(o.userData.id)) flipV(o.geometry);
 
   // parts made of several meshes (door + quarter panel) or cut from the glass get one shared logo projection
   for (const id of ['puerta-ti', 'puerta-td', 'vidrio-ti', 'vidrio-td']) {
