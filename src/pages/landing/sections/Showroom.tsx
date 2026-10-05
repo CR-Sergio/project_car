@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Ransom } from '../../../components/Ransom';
-import { MESSAGES_CAPACITY, MESSAGE_PARTS, PART_BY_ID, roomiestMessagePart } from '../../../data/parts';
+import { MESSAGE_PARTS, PART_BY_ID, messagesStock, roomiestMessagePart } from '../../../data/parts';
 import { useLocale } from '../../../state/locale';
 import { useSales } from '../../../state/sales';
 import type { ShowroomHandle } from '../../../three/showroom';
@@ -76,11 +76,13 @@ export function Showroom({ onEnter }: { onEnter: (id?: string) => void }) {
         <span className="tape" aria-hidden="true" />
         <div className="rw-head">
           <h3>{t('rw.title')}</h3>
-          <span>{t('msgOf', { k: messages.length, cap: MESSAGES_CAPACITY })}</span>
+          <span>{t('msgOf', { k: messages.length })}{messagesStock(messages).low && <b className="rw-low"> · {t('msgLow')}</b>}</span>
         </div>
         <p className="rw-names">{messages.length ? messages.map(m => `“${m.text}”${m.name ? ' — ' + m.name : ''}`).join(' · ') : t('rw.empty')}</p>
         {wall.names.length > 0 && <p className="rw-roof"><b>{t('rw.roof')}</b> {t('namesCount', { k: wall.names.length })}</p>}
-        <button className="btn" type="button" onClick={() => onEnter(roomiestMessagePart(messages))}>{t('rw.cta', { p: money(priceOf(MESSAGE_PARTS[0])) })}</button>
+        {messagesStock(messages).left > 0
+          ? <button className="btn" type="button" onClick={() => onEnter(roomiestMessagePart(messages))}>{t('rw.cta', { p: money(priceOf(MESSAGE_PARTS[0])) })}</button>
+          : <button className="btn" type="button" disabled>{t('msgSoldOut')}</button>}
       </div>
     </section>
   );

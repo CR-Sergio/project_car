@@ -146,7 +146,7 @@ export const es = {
   "nameConsent": "Es mi nombre, o tengo permiso de la persona para publicarlo.",
   "errNameConsent": "Confirma que el nombre es tuyo o que tienes permiso de publicarlo.",
   "faq.q8": "No tengo marca, ¿cómo puedo apoyar?",
-  "faq.a8": "Deja un mensaje de hasta {max} caracteres en una salpicadera por {p}, y de regalo tu nombre (o el de quien quieras, con su permiso) va en el techo. Caben {cap} mensajes y salen en los videos.",
+  "faq.a8": "Deja un mensaje de hasta {max} caracteres en una salpicadera por {p}, y de regalo tu nombre (o el de quien quieras, con su permiso) va en el techo. Salen en los videos y se venden hasta agotar existencias.",
   "rw.title": "Mensajes de la raza",
   "rw.empty": "Todavía no hay mensajes. Deja el primero.",
   "rw.cta": "Deja tu mensaje · {p}",
@@ -154,7 +154,7 @@ export const es = {
   "noRefundName": "Entiendo que <b>todas las ventas son finales</b>: no hay devoluciones ni reembolsos salvo los casos de la cláusula 7 de los términos.",
   "eachMsg": "por mensaje",
   "msgCount": "{k} mensajes",
-  "msgOf": "{k} de {cap} mensajes",
+  "msgOf": "{k} mensajes · hasta agotar existencias",
   "msgPitch": "¿No tienes marca? Deja tu mensaje de hasta {max} caracteres en esta salpicadera y, de regalo, tu nombre va en el techo.",
   "msgLast": "Los últimos:",
   "msgIncl": "Tu mensaje rotulado + tu nombre gratis en el techo + sale en los videos",
@@ -178,7 +178,9 @@ export const es = {
   "nowMsg": "Tu mensaje ya está en la salpicadera.",
   "nowMsgRoof": "Tu mensaje ya está en la salpicadera y <b>{b}</b> en el techo.",
   "rw.roof": "En el techo:",
-  "each": "c/u"
+  "each": "c/u",
+  "msgLow": "¡Quedan pocos lugares!",
+  "msgSoldOut": "Agotado"
 } as const;
 
 export type TextKey = keyof typeof es;
@@ -329,7 +331,7 @@ export const en: Partial<Record<TextKey, string>> = {
   "nameConsent": "It is my name, or I have the person’s permission to publish it.",
   "errNameConsent": "Confirm the name is yours or that you have permission to publish it.",
   "faq.q8": "I don’t have a brand. How can I help?",
-  "faq.a8": "Leave a message of up to {max} characters on a fender for {p}, and as a gift your name (or someone else’s, with their permission) goes on the roof. There is room for {cap} messages and they show up in the videos.",
+  "faq.a8": "Leave a message of up to {max} characters on a fender for {p}, and as a gift your name (or someone else’s, with their permission) goes on the roof. They show up in the videos and are sold while space lasts.",
   "rw.title": "Messages from the people",
   "rw.empty": "No messages yet. Leave the first one.",
   "rw.cta": "Leave your message · {p}",
@@ -337,7 +339,7 @@ export const en: Partial<Record<TextKey, string>> = {
   "noRefundName": "I understand that <b>all sales are final</b>: there are no returns or refunds except as set out in clause 7 of the terms.",
   "eachMsg": "per message",
   "msgCount": "{k} messages",
-  "msgOf": "{k} of {cap} messages",
+  "msgOf": "{k} messages · while they last",
   "msgPitch": "No brand? Leave your message of up to {max} characters on this fender and, as a gift, your name goes on the roof.",
   "msgLast": "Latest:",
   "msgIncl": "Your message wrapped + your name free on the roof + shows up in the videos",
@@ -361,5 +363,7 @@ export const en: Partial<Record<TextKey, string>> = {
   "nowMsg": "Your message is now on the fender.",
   "nowMsgRoof": "Your message is now on the fender and <b>{b}</b> on the roof.",
   "rw.roof": "On the roof:",
-  "each": "each"
+  "each": "each",
+  "msgLow": "Only a few spots left!",
+  "msgSoldOut": "Sold out"
 };

@@ -1,6 +1,6 @@
 import { Ransom } from '../../../components/Ransom';
 import { LEGAL, RESTRICTED } from '../../../data/legal';
-import { MESSAGES_CAPACITY, MESSAGE_MAX, MESSAGE_PARTS } from '../../../data/parts';
+import { MESSAGE_MAX, MESSAGE_PARTS } from '../../../data/parts';
 import { useLocale } from '../../../state/locale';
 
 const QUESTIONS = [1, 8, 2, 3, 4, 5, 6, 7] as const;
@@ -8,7 +8,7 @@ const QUESTIONS = [1, 8, 2, 3, 4, 5, 6, 7] as const;
 export function Faq() {
   const { t, lang, money, priceOf } = useLocale();
   // answers take their numbers from the same config as the Terms, so they never disagree
-  const vars = { months: LEGAL.vigenciaMeses, videos: LEGAL.videosMinimos, list: RESTRICTED[lang].join(', '), p: money(priceOf(MESSAGE_PARTS[0])), cap: MESSAGES_CAPACITY, max: MESSAGE_MAX };
+  const vars = { months: LEGAL.vigenciaMeses, videos: LEGAL.videosMinimos, list: RESTRICTED[lang].join(', '), p: money(priceOf(MESSAGE_PARTS[0])), max: MESSAGE_MAX };
   return (
     <section id="dudas">
       <div className="sec-head"><Ransom as="h2" es="DUDAS" en="FAQ" seed={9} /></div>

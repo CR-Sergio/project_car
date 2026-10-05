@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BRAND_PARTS, EXAMPLE_MESSAGES, EXAMPLE_SOLD, MESSAGES_CAPACITY, MESSAGE_MAX, MESSAGE_PARTS, MESSAGE_RE, NAMES_PART_ID, NAME_RE, ORDER, PALIO_ASPECT, PARTS, PART_BY_ID, cleanName, roofNames, roomiestMessagePart } from './parts';
+import { BRAND_PARTS, EXAMPLE_MESSAGES, EXAMPLE_SOLD, MESSAGES_CAPACITY, MESSAGE_MAX, MESSAGE_PARTS, MESSAGE_RE, NAMES_PART_ID, NAME_RE, ORDER, PALIO_ASPECT, PARTS, PART_BY_ID, cleanName, messagesStock, MESSAGES_PER_PART, roofNames, roomiestMessagePart } from './parts';
 import { en, es } from '../i18n/strings';
 import { GOAL_MXN } from './config';
 
@@ -39,5 +39,12 @@ describe('parts catalog', () => {
     for (const ok of ['Doña Lupe', '@mau.mty', 'Fer y Caro', "O'Brien", 'Chuy_81', 'Memo & Ana']) expect(NAME_RE.test(ok)).toBe(true);
     for (const bad of ['<script>', 'hola 😀', 'a/b', 'x=1']) expect(NAME_RE.test(bad)).toBe(false);
     expect(cleanName('  Tío   Beto ')).toBe('Tío Beto');
+  });
+  it('sells messages while they last and warns when few spots are left', () => {
+    const fill = (n: number, part = 'salpi-i') => Array.from({ length: n }, () => ({ text: 'x', part }));
+    expect(messagesStock([])).toEqual({ left: MESSAGES_CAPACITY, low: false });
+    expect(messagesStock(fill(MESSAGES_CAPACITY - 5)).low).toBe(true);
+    expect(messagesStock(fill(MESSAGES_PER_PART), 'salpi-i')).toEqual({ left: 0, low: false });
+    expect(messagesStock(fill(MESSAGES_PER_PART - 3), 'salpi-i').low).toBe(true);
   });
 });

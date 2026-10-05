@@ -2,7 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import { useNavigate, useParams } from 'react-router';
 import { useDoor } from '../../app/door';
 import { Ransom } from '../../components/Ransom';
-import { BRAND_PARTS, MESSAGES_CAPACITY, MESSAGES_PER_PART, MESSAGE_MAX, ORDER, PART_BY_ID, PARTS, ZONES, roomiestMessagePart } from '../../data/parts';
+import { BRAND_PARTS, MESSAGES_CAPACITY, MESSAGES_PER_PART, MESSAGE_MAX, messagesStock, ORDER, PART_BY_ID, PARTS, ZONES, roomiestMessagePart } from '../../data/parts';
 import { REDUCED } from '../../lib/motion';
 import { useLocale } from '../../state/locale';
 import { useSales } from '../../state/sales';
@@ -132,7 +132,8 @@ export default function GaragePage() {
           ? <div className="g-price">{t('roofFree')} <small>{t('roofWith')}</small></div>
           : <div className="g-price">{money(priceOf(p))} <small>{cur}{isMsgs ? ' ' + t('each') : ''}</small></div>}
         {isRoof && <div className="g-status free">{t('namesCount', { k: wall.names.length })}</div>}
-        {isMsgs && <div className="g-status free">{t('msgOf', { k: here.length, cap: MESSAGES_PER_PART })}</div>}
+        {isMsgs && <div className={'g-status ' + (partFull ? 'sold' : 'free')}>{partFull ? t('msgSoldOut') : t('msgOf', { k: here.length })}</div>}
+        {isMsgs && !partFull && messagesStock(messages, p.id).low && <div className="g-status low">{t('msgLow')}</div>}
         {!p.kind && <div className={'g-status ' + (s ? 'sold' : 'free')}>{s ? t('soldTo', { b: s.brand }) : t('free')}</div>}
         {isRoof && <p className="g-names">{t('roofPitch')} {wall.names.length > 0 && <><br /><b>{t('roofLast')}</b> {wall.names.slice(-5).reverse().join(' · ')}</>}</p>}
         {isMsgs && <p className="g-names">{t('msgPitch', { max: MESSAGE_MAX })} {here.length > 0 && <><br /><b>{t('msgLast')}</b> {here.slice(-3).reverse().map(m => `“${m}”`).join(' · ')}</>}</p>}

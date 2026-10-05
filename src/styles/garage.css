@@ -44,7 +44,7 @@ html.in-garage,html.in-garage body{overflow:hidden}
 .g-price{font-family:var(--f-display);font-size:46px;line-height:1;color:var(--race);font-variant-numeric:tabular-nums}
 .g-price small{font-size:15px;color:var(--ink)}
 .g-status{display:inline-block;margin:10px 0 14px;font-family:var(--f-mono);font-size:12px;padding:4px 8px;color:var(--paper)}
-.g-status.free{background:var(--ok)} .g-status.sold{background:var(--ink)}
+.g-status.free{background:var(--ok)} .g-status.sold{background:var(--ink)} .g-status.low{background:var(--race);margin-left:6px}
 .g-statlist{display:grid;gap:9px;margin-bottom:14px}
 .stat{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;align-items:center;font-size:13px}
 .stat span{grid-column:1/-1;font-weight:600}

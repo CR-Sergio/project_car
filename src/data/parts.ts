@@ -62,10 +62,18 @@ export const MESSAGE_PARTS = PARTS.filter(p => p.kind === 'messages');
 export const MESSAGE_PRICE_MXN = MESSAGE_PARTS[0].price;
 /** caracteres por mensaje */
 export const MESSAGE_MAX = 24;
-/** mensajes que caben en cada salpicadera (≈95 × 45 cm, letras de ≈1.5-2 cm: 4 columnas × 22 renglones).
-    ≈170 entre las dos; si se rotulan más chicos caben más: sube este número. */
+/** límite interno de mensajes por salpicadera (≈95 × 45 cm, letras de ≈1.5-2 cm: 4 columnas × 22 renglones).
+    En la página NO se muestra: se venden "hasta agotar existencias". Si se rotulan más chicos caben más: sube este número
+    (con 120 por lado, vendiendo todo se llega a la meta). */
 export const MESSAGES_PER_PART = 85;
 export const MESSAGES_CAPACITY = MESSAGES_PER_PART * MESSAGE_PARTS.length;
+/** a partir de cuántos lugares libres se avisa "quedan pocos" */
+export const MESSAGES_LOW = 20;
+/** lugares libres en total y en una salpicadera, y si ya hay que avisar que quedan pocos */
+export function messagesStock(list: Message[], part?: string) {
+  const left = part ? MESSAGES_PER_PART - messagesOn(list, part).length : MESSAGES_CAPACITY - list.length;
+  return { left: Math.max(0, left), low: left > 0 && left <= MESSAGES_LOW * (part ? 1 / MESSAGE_PARTS.length : 1) };
+}
 /** el techo: un nombre de regalo por cada mensaje */
 export const NAMES_PART_ID = 'techo';
 export const NAME_MAX = 22;
