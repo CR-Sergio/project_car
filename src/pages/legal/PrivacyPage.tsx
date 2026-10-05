@@ -8,7 +8,7 @@ export default function PrivacyPage() {
   return (
     <LegalLayout title="AVISO DE PRIVACIDAD" titleEn="PRIVACY NOTICE" seed={41} stamp="DATOS PROTEGIDOS">
       <p>
-        <strong><V v={L.responsable} /></strong>, persona física con RFC <V v={L.rfc} />, que opera el proyecto “Proyect Car” en el
+        <strong><V v={L.responsable} /></strong>, persona física que opera el proyecto “Proyect Car” en el
         sitio {L.sitio} (en adelante, “Proyect Car” o “nosotros”), con domicilio en <V v={L.domicilio} />, es responsable del
         tratamiento de los datos personales que nos proporciones, conforme a la Ley Federal de Protección de Datos Personales
         en Posesión de los Particulares (la “Ley”).
@@ -19,8 +19,7 @@ export default function PrivacyPage() {
       <ul>
         <li><strong>Identificación y contacto:</strong> nombre de tu marca, correo electrónico y, si lo das, tu Instagram o sitio web.</li>
         <li><strong>Contenido de tu marca:</strong> el logo y el color que subes para rotular la pieza.</li>
-        <li><strong>Fiscales (solo si pides factura):</strong> RFC, nombre o razón social, régimen fiscal, código postal fiscal y uso del CFDI.</li>
-        <li><strong>De la operación:</strong> pieza comprada, monto, fecha y folio del pago.</li>
+        <li><strong>De la operación:</strong> pieza comprada, monto, fecha y folio del pago, y la fecha y hora en que aceptaste los términos, este aviso y la política de no reembolsos.</li>
       </ul>
       <p>
         <strong>No recabamos datos de tu tarjeta ni de tu cuenta bancaria:</strong> el pago lo procesan directamente Mercado Pago o
@@ -34,8 +33,8 @@ export default function PrivacyPage() {
         <li>Diseñar, imprimir, instalar y, al terminar la vigencia, retirar el vinil con tu marca.</li>
         <li>Publicar tu marca y tu logo en el carro, en los videos del canal, en el sitio y en redes sociales, como parte del servicio que contratas.</li>
         <li>Contactarte sobre tu pieza (aprobación del diseño, fechas de instalación, cambios).</li>
-        <li>Emitir tu factura (CFDI) y cumplir obligaciones fiscales.</li>
-        <li>Atender aclaraciones, cancelaciones, reembolsos y solicitudes de derechos ARCO.</li>
+        <li>Cumplir obligaciones legales y fiscales, y conservar la evidencia de la operación.</li>
+        <li>Atender aclaraciones, contracargos y solicitudes de derechos ARCO.</li>
       </ol>
       <p><strong>Finalidades adicionales</strong> (puedes negarte y aun así comprar):</p>
       <ol>
@@ -51,7 +50,6 @@ export default function PrivacyPage() {
       <table>
         <thead><tr><th>Quién</th><th>Para qué</th><th>¿Requiere tu consentimiento?</th></tr></thead>
         <tbody>
-          <tr><td>Servicio de Administración Tributaria (SAT) y proveedor de facturación</td><td>Emitir tu factura y cumplir obligaciones fiscales</td><td>No (obligación legal)</td></tr>
           <tr><td>Autoridades competentes</td><td>Cuando la ley o un mandato de autoridad lo exija</td><td>No</td></tr>
           <tr><td>Taller de rotulado</td><td>Imprimir e instalar tu vinil (solo recibe tu logo, color y la pieza)</td><td>No (es necesario para el servicio)</td></tr>
         </tbody>
@@ -71,7 +69,7 @@ export default function PrivacyPage() {
       </p>
       <p>
         Ten en cuenta que no podremos borrar tu logo de videos ya publicados mientras dure la vigencia contratada, ni datos que la ley
-        nos obligue a conservar (por ejemplo, los de tus facturas, durante el plazo que marcan las leyes fiscales).
+        nos obligue a conservar, ni los que necesitemos para acreditar la operación ante una aclaración o contracargo.
       </p>
 
       <h2><span className="n">5.</span>Revocar tu consentimiento y limitar el uso</h2>

@@ -3,44 +3,36 @@
    las páginas legales lo marcan en amarillo. Haz que un abogado revise los textos
    (src/pages/legal/) antes de lanzar: son una base, no asesoría legal. */
 export const LEGAL = {
-  /** nombre completo de la persona física responsable (quien se da de alta en el SAT) */
+  /** nombre completo de la persona responsable del proyecto */
   responsable: '[TU NOMBRE COMPLETO]',
-  rfc: '[TU RFC]',
-  regimen: 'Régimen Simplificado de Confianza (RESICO)',
+  /** domicilio para recibir notificaciones (puede ser una oficina o un domicilio convencional, no tiene que ser tu casa) */
   domicilio: '[CALLE Y NÚMERO, COLONIA, C.P., MONTERREY, NUEVO LEÓN]',
   email: '[contacto@proyectcar.com]',
   sitio: 'proyectcar.com',
   /** fecha de la última actualización de los textos legales */
   actualizado: '5 de octubre de 2026',
 
-  /* condiciones del servicio (también salen en las Dudas) */
+  /* condiciones del servicio (también salen en las Dudas y en el checkout) */
   /** meses que se queda el vinil desde que se instala */
-  vigenciaMeses: 12,
-  /** videos mínimos del canal donde aparece la pieza */
-  videosMinimos: 6,
+  vigenciaMeses: 6,
+  /** videos mínimos del canal en los que aparece la pieza durante la vigencia */
+  videosMinimos: 3,
   /** días hábiles para mandar el logo después de pagar */
-  diasLogo: 10,
+  diasLogo: 5,
+  /** días hábiles para mandar la prueba de diseño después de recibir el logo.
+      Junto con el apartado inmediato, el servicio empieza dentro de 10 días hábiles: así no aplica la
+      revocación de 5 días del art. 56 de la Ley Federal de Protección al Consumidor. No lo subas de 10. */
+  diasDiseno: 5,
+  /** días hábiles para aprobar o pedir cambios; si no contestas, el diseño se da por aprobado */
+  diasAprobacion: 3,
   /** días hábiles para instalar después de aprobar el diseño */
-  diasInstalacion: 20,
-  /** días hábiles para cancelar con reembolso completo (si el vinil no se ha impreso) */
-  diasCancelacion: 5,
+  diasInstalacion: 15,
+  /** días naturales sin logo tras los cuales rotulamos el nombre de la marca en texto */
+  diasSinLogo: 30,
 };
 
 /** placeholder still to fill in */
 export const isPending = (v: string | number) => typeof v === 'string' && v.startsWith('[');
-
-/** CFDI 4.0: regímenes fiscales más comunes de quien compra publicidad */
-export const REGIMENES: [string, string][] = [
-  ['601', '601 · General de Ley Personas Morales'],
-  ['603', '603 · Personas Morales con Fines no Lucrativos'],
-  ['612', '612 · Personas Físicas con Actividades Empresariales y Profesionales'],
-  ['626', '626 · Régimen Simplificado de Confianza'],
-  ['621', '621 · Incorporación Fiscal'],
-  ['606', '606 · Arrendamiento'],
-  ['616', '616 · Sin obligaciones fiscales'],
-];
-/** RFC: 3 letras (moral) o 4 (física), fecha AAMMDD y homoclave */
-export const RFC_RE = /^([A-ZÑ&]{3,4})(\d{2})(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])([A-Z\d]{2}[A\d])$/;
 
 /** marcas que no se aceptan (Términos, Dudas y checkout) */
 export const RESTRICTED = {

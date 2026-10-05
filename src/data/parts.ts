@@ -1,4 +1,4 @@
-import { usdOf } from './budget';
+import { usdOf } from './currency';
 
 export type Zone = 'Frente' | 'Arriba' | 'Lado izq.' | 'Lado der.' | 'Atrás';
 
@@ -6,14 +6,14 @@ export interface Part {
   id: string;
   name: string;
   en: string;
-  /** precio en MXN, MÁS IVA */
+  /** precio final en MXN */
   price: number;
-  /** precio en USD, más IVA (se calcula con el tipo de cambio de src/data/budget.ts) */
+  /** precio en USD de referencia (se calcula con el tipo de cambio de src/data/currency.ts) */
   usd: number;
   zone: Zone;
-  /** medida del vinil, "≈ ancho × alto cm": de aquí sale el costo del vinil */
+  /** medida aproximada del vinil */
   size: string;
-  /** Payment Links (modo live): el monto del link es el precio CON IVA */
+  /** Payment Links (modo live) */
   mp: string;
   stripe: string;
   stripeUsd?: string;
@@ -22,8 +22,6 @@ export interface Part {
   tam: number;
   cuadro: number;
   glass?: boolean;
-  /** vidrio que lleva vinil microperforado (se puede ver hacia afuera desde adentro) */
-  microperf?: boolean;
 }
 
 type PartInput = Omit<Part, 'usd' | 'mp' | 'stripe'> & Partial<Pick<Part, 'mp' | 'stripe'>>;
@@ -34,14 +32,14 @@ const RAW: PartInput[] = [
   {id:'techo',      name:'Techo',                           en:'Roof',                   price:18000, zone:'Arriba',    size:'≈ 150 × 120 cm', vis:6, tam:9, cuadro:7},
   {id:'puerta-di',  name:'Puerta delantera izquierda',      en:'Front left door',        price:9500,  zone:'Lado izq.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
   {id:'puerta-ti',  name:'Puerta trasera izquierda',        en:'Rear left door',         price:10500, zone:'Lado izq.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
-  {id:'vidrio-ti',  name:'Ventana trasera izquierda',       en:'Rear left window',       price:7500,  zone:'Lado izq.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true, microperf:true},
+  {id:'vidrio-ti',  name:'Ventana trasera izquierda',       en:'Rear left window',       price:7500,  zone:'Lado izq.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true},
   {id:'salpi-i',    name:'Salpicadera delantera izquierda', en:'Front left fender',      price:7500,  zone:'Lado izq.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6},
   {id:'puerta-dd',  name:'Puerta delantera derecha',        en:'Front right door',       price:9500,  zone:'Lado der.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
   {id:'puerta-td',  name:'Puerta trasera derecha',          en:'Rear right door',        price:10500, zone:'Lado der.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
-  {id:'vidrio-td',  name:'Ventana trasera derecha',         en:'Rear right window',      price:7500,  zone:'Lado der.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true, microperf:true},
+  {id:'vidrio-td',  name:'Ventana trasera derecha',         en:'Rear right window',      price:7500,  zone:'Lado der.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true},
   {id:'salpi-d',    name:'Salpicadera delantera derecha',   en:'Front right fender',     price:7500,  zone:'Lado der.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6},
   {id:'porton',     name:'Portón trasero',                  en:'Tailgate',               price:12000, zone:'Atrás',     size:'≈ 120 × 45 cm',  vis:8, tam:6, cuadro:7},
-  {id:'medallon',   name:'Medallón (vidrio trasero)',       en:'Rear window',            price:12000, zone:'Atrás',     size:'≈ 95 × 45 cm',   vis:8, tam:5, cuadro:7, glass:true, microperf:true},
+  {id:'medallon',   name:'Medallón (vidrio trasero)',       en:'Rear window',            price:12000, zone:'Atrás',     size:'≈ 95 × 45 cm',   vis:8, tam:5, cuadro:7, glass:true},
   {id:'defensa-t',  name:'Defensa trasera',                 en:'Rear bumper',            price:8000,  zone:'Atrás',     size:'≈ 160 × 25 cm',  vis:8, tam:3, cuadro:6},
 ];
 export const PARTS: Part[] = RAW.map(p => ({ mp: '', stripe: '', ...p, usd: usdOf(p.price) }));
@@ -52,7 +50,6 @@ export const ZONE_EN: Record<Zone, string> = {'Frente':'Front','Arriba':'Top','L
 export const ORDER: Part[] = ZONES.flatMap(z => PARTS.filter(p => p.zone === z));
 export const PART_BY_ID: Record<string, Part> = Object.fromEntries(PARTS.map(p => [p.id, p]));
 
-export interface Invoice { rfc: string; razon: string; regimen: string; cp: string; uso: string }
 export interface Sale {
   brand: string;
   color: string;
@@ -60,11 +57,9 @@ export interface Sale {
   img?: HTMLImageElement | null;
   email?: string;
   link?: string;
-  /** datos para la factura, si la pidió */
-  invoice?: Invoice | null;
   /** aceptó recibir noticias (finalidad secundaria del aviso de privacidad) */
   news?: boolean;
-  /** cuándo aceptó términos y aviso */
+  /** cuándo aceptó términos, aviso de privacidad y la política de no reembolsos */
   acceptedAt?: string;
 }
 export type SoldMap = Record<string, Sale>;

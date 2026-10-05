@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { EXAMPLE_SOLD, ORDER, PALIO_ASPECT, PARTS, PART_BY_ID } from './parts';
 import { en, es } from '../i18n/strings';
+import { GOAL_MXN } from './config';
 
 describe('parts catalog', () => {
   it('has 15 unique parts, all reachable from the garage menu', () => {
@@ -14,5 +15,9 @@ describe('parts catalog', () => {
   });
   it('has every text in English too', () => {
     expect(Object.keys(es).filter(k => en[k as keyof typeof es] == null)).toEqual([]);
+  });
+  it('reaches the 150,000 MXN goal when every part is sold', () => {
+    expect(GOAL_MXN).toBe(150000);
+    expect(PARTS.reduce((a, p) => a + p.price, 0)).toBeGreaterThanOrEqual(GOAL_MXN);
   });
 });

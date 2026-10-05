@@ -3,8 +3,6 @@ import { useNavigate, useParams } from 'react-router';
 import { useDoor } from '../../app/door';
 import { Ransom } from '../../components/Ransom';
 import { ORDER, PART_BY_ID, PARTS, ZONES } from '../../data/parts';
-import { MXN_PER_USD } from '../../data/budget';
-import { vinylCost } from '../../lib/budget';
 import { REDUCED } from '../../lib/motion';
 import { useLocale } from '../../state/locale';
 import { useSales } from '../../state/sales';
@@ -123,14 +121,14 @@ export default function GaragePage() {
         <span className="tape" aria-hidden="true" />
         <div className="g-eyebrow">{t('piece', { z: zoneOf(p.zone), i: idx + 1, N: ORDER.length })}</div>
         <h3>{nameOf(p)}</h3>
-        <div className="g-price">{money(priceOf(p))} <small>{cur} {t('plusIva')}</small></div>
+        <div className="g-price">{money(priceOf(p))} <small>{cur}</small></div>
         <div className={'g-status ' + (s ? 'sold' : 'free')}>{s ? t('soldTo', { b: s.brand }) : t('free')}</div>
         <div className="g-statlist">
           {STATS.map(k => (
             <div className="stat" key={k}><span>{t(k)}</span><div className="segs" data-v={p[k]}>{Array.from({ length: 10 }, (_, i) => <i key={i} />)}</div><b>{p[k]}</b></div>
           ))}
         </div>
-        <dl className="g-spec"><dt>{t('area')}</dt><dd>{p.size}</dd><dt>{t('incl')}</dt><dd>{t('inclTxt')}</dd><dt>{t('vinylCost')}</dt><dd>≈ {money(cur === 'USD' ? Math.round(vinylCost(p) / MXN_PER_USD) : vinylCost(p))} {t('vinylIncl')}</dd></dl>
+        <dl className="g-spec"><dt>{t('area')}</dt><dd>{p.size}</dd><dt>{t('incl')}</dt><dd>{t('inclTxt')}</dd></dl>
         <div className="g-actions">
           <button className="g-arrow" aria-label={t('prev')} onClick={() => step(-1)}>◀</button>
           <button className="btn" disabled={!!s} onClick={() => setBuying(selected)}>{s ? t('taken') : t('buy')}</button>

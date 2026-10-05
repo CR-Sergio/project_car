@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { IVA } from '../../data/budget';
 import { PAY_MODE } from '../../data/config';
-import { REGIMENES, RFC_RE } from '../../data/legal';
 import { PART_BY_ID } from '../../data/parts';
 import { brandCanvas } from '../../lib/brandCanvas';
 import { escapeHtml } from '../../lib/format';
@@ -24,10 +22,8 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
   const [logo, setLogo] = useState<HTMLImageElement | null>(null);
   const [method, setMethod] = useState<'mp' | 'stripe'>(usd ? 'stripe' : 'mp');
   const [err, setErr] = useState(''), [processing, setProcessing] = useState(false);
-  const [wantsInvoice, setWantsInvoice] = useState(false);
-  const [inv, setInv] = useState({ rfc: '', razon: '', regimen: '601', cp: '' });
-  const [accepted, setAccepted] = useState(false), [noNews, setNoNews] = useState(false);
-  const subtotal = priceOf(p), iva = Math.round(subtotal * IVA), total = subtotal + iva;
+  const [accepted, setAccepted] = useState(false), [finalSale, setFinalSale] = useState(false), [noNews, setNoNews] = useState(false);
+  const total = priceOf(p);
   const modal = useRef<HTMLDivElement>(null), pv = useRef<HTMLCanvasElement>(null), first = useRef<HTMLInputElement>(null), ok = useRef<HTMLButtonElement>(null);
 
   const closeRef = useRef(onClose); closeRef.current = onClose;
@@ -62,11 +58,8 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
     const b = brand.trim(), m = email.trim();
     if (!b) return setErr(t('errBrand'));
     if (!/^\S+@\S+\.\S+$/.test(m)) return setErr(t('errEmail'));
-    const rfc = inv.rfc.trim().toUpperCase();
-    if (wantsInvoice && !RFC_RE.test(rfc)) return setErr(t('errRfc'));
-    if (wantsInvoice && (!inv.razon.trim() || !/^\d{5}$/.test(inv.cp.trim()))) return setErr(t('errInvoice'));
     if (!accepted) return setErr(t('errAccept'));
-    const invoice = wantsInvoice ? { rfc, razon: inv.razon.trim().toUpperCase(), regimen: inv.regimen, cp: inv.cp.trim(), uso: 'G03' } : null;
+    if (!finalSale) return setErr(t('errRefund'));
     const via = method === 'mp' ? 'Mercado Pago' : 'Stripe';
     if (PAY_MODE === 'live') {
       const url = usd && p.stripeUsd ? p.stripeUsd : p[method];
@@ -75,7 +68,7 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
     }
     setProcessing(true);
     setTimeout(() => {
-      markSold(partId, { brand: b, color, img: logo, email: m, link: link.trim(), invoice, news: !noNews, acceptedAt: new Date().toISOString() });
+      markSold(partId, { brand: b, color, img: logo, email: m, link: link.trim(), news: !noNews, acceptedAt: new Date().toISOString() });
       setStep({ kind: 'done', brand: b, via }); confetti(color); toast(t('toast'));
     }, 1100);
   }
@@ -94,7 +87,7 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
           </div>
         )}
         {step.kind === 'form' && <>
-          <h3 id="mTitle">{nameOf(p)}</h3><p className="sub">{money(subtotal)} {cur} {t('plusIva')} · {p.size}</p>
+          <h3 id="mTitle">{nameOf(p)}</h3><p className="sub">{money(total)} {cur} · {t('priceFinal')} · {p.size}</p>
           {PAY_MODE === 'test' && <p className="testbar">{t('test')}</p>}
           <form noValidate onSubmit={submit}>
             <div className="row2">
@@ -111,25 +104,8 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
               <label><input type="radio" name="pm" value="stripe" checked={method === 'stripe'} onChange={() => setMethod('stripe')} /> Stripe</label>
             </div>
             {usd && <p className="sub">{t('usdNote')}</p>}
-            <label className="check"><input type="checkbox" checked={wantsInvoice} onChange={e => setWantsInvoice(e.target.checked)} /> {t('invoice')}</label>
-            {wantsInvoice && (
-              <fieldset className="invoice">
-                <div className="row2">
-                  <div className="field"><label htmlFor="f-rfc">{t('rfc')}</label><input type="text" id="f-rfc" maxLength={13} autoCapitalize="characters" value={inv.rfc} onChange={e => setInv({ ...inv, rfc: e.target.value })} /></div>
-                  <div className="field"><label htmlFor="f-cp">{t('cp')}</label><input type="text" id="f-cp" inputMode="numeric" maxLength={5} value={inv.cp} onChange={e => setInv({ ...inv, cp: e.target.value })} /></div>
-                </div>
-                <div className="field"><label htmlFor="f-razon">{t('razon')}</label><input type="text" id="f-razon" value={inv.razon} onChange={e => setInv({ ...inv, razon: e.target.value })} /></div>
-                <div className="field"><label htmlFor="f-reg">{t('regimen')}</label>
-                  <select id="f-reg" value={inv.regimen} onChange={e => setInv({ ...inv, regimen: e.target.value })}>{REGIMENES.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></div>
-                <p className="fine">{t('usoCfdi')}</p>
-              </fieldset>
-            )}
-            <dl className="totals">
-              <dt>{t('subtotal')}</dt><dd>{money(subtotal)}</dd>
-              <dt>{t('ivaLine', { p: Math.round(IVA * 100) })}</dt><dd>{money(iva)}</dd>
-              <dt>{t('total')}</dt><dd>{money(total)} {cur}</dd>
-            </dl>
             <label className="check"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t('accept') }} /></label>
+            <label className="check"><input type="checkbox" checked={finalSale} onChange={e => setFinalSale(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t('noRefund') }} /></label>
             <label className="check"><input type="checkbox" checked={noNews} onChange={e => setNoNews(e.target.checked)} /> {t('noNews')}</label>
             <p className="fine">{t('privacyShort', { who: 'Proyect Car' })} {t('restrictedNote')}</p>
             <p className="err">{err}</p>

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { detectCurrency, detectLang, fill, formatMoney, goalIn } from './format';
-import { GOAL_MXN, GOAL_USD } from './budget';
+import { GOAL_MXN, GOAL_USD } from '../data/config';
 
 describe('money and goal', () => {
   it('formats pesos and dollars like the original page', () => {

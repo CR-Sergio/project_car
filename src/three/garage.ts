@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { PART_BY_ID, type SoldMap } from '../data/parts';
-import { GOAL_MXN } from '../lib/budget';
+import { GOAL_MXN } from '../data/config';
 import { REDUCED } from '../lib/motion';
 import { loadPalio } from './model';
 import { paintAll, pulseSelected, setSelected, setSold } from './paint';
