@@ -1,0 +1,25 @@
+/* ---------- checkout modal ---------- */
+.modal{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:16px;background:rgba(10,9,12,.78)}
+.sheet{width:min(560px,100%);max-height:calc(100% - 20px);overflow:auto;background-color:var(--paper);color:var(--ink);padding:24px;position:relative;box-shadow:8px 10px 0 rgba(0,0,0,.5);animation:cardIn .4s cubic-bezier(.2,1.3,.4,1)}
+.sheet h3{font-family:var(--f-display);font-weight:400;font-size:26px;margin:0 0 4px;line-height:1.1}
+.sheet .sub{margin:0 0 16px;color:#6b6470;font-size:14px}
+.testbar{font-family:var(--f-mono);font-size:12px;background:var(--tape);padding:8px 10px;margin:0 0 16px;letter-spacing:.02em}
+.field{display:grid;gap:5px;margin-bottom:12px}
+.field label,.legend-label{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#4d4752}
+.field input[type=text],.field input[type=email],.field input[type=url]{font:inherit;font-size:16px;padding:10px 12px;border:2px solid var(--ink);background:#fbf8f0;color:var(--ink);border-radius:0;width:100%}
+.row2{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:end}
+.field input[type=color]{width:56px;height:44px;border:2px solid var(--ink);padding:2px;background:#fbf8f0}
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:6px 0 16px}
+.pay label{display:flex;gap:8px;align-items:center;border:2px solid var(--ink);padding:10px;cursor:pointer;font-weight:600;font-size:14px;background:#fbf8f0}
+.pay input{accent-color:var(--race)}
+.pay label:has(input:checked){background:var(--ink);color:var(--paper)}
+.preview{display:flex;gap:12px;align-items:center;margin:2px 0 14px}
+.preview canvas{width:160px;height:80px;border:2px solid var(--ink)}
+.preview span{font-size:13px;color:#6b6470}
+.sheet .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.linkbtn{background:none;border:0;font:inherit;text-decoration:underline;cursor:pointer;color:var(--ink);padding:6px}
+.err{color:var(--race);font-size:13px;min-height:1.2em;margin:0 0 8px}
+.done{text-align:center;padding:10px 0}
+.done .big{font-family:var(--f-display);font-size:40px;color:var(--race);line-height:1}
+.confetti{position:fixed;z-index:97;pointer-events:none;width:14px;height:10px}
+@keyframes cardIn{from{transform:rotate(-6deg) translateY(-14px)}}
