@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { REDUCED } from '../lib/motion';
 import { loadPalio } from './model';
-import { paintAll, pulseSelected, setNames, setSold } from './paint';
+import { paintAll, pulseSelected, setSold, setWall, type Wall } from './paint';
 import { Viewer, checkerTexture, studioLights } from './viewer';
 import type { SoldMap } from '../data/parts';
 
-export interface ShowroomHandle { setSold: (s: SoldMap) => void; setNames: (n: string[]) => void; dispose: () => void }
+export interface ShowroomHandle { setSold: (s: SoldMap) => void; setWall: (w: Wall) => void; dispose: () => void }
 interface Opts {
   onPart: (id: string) => void;
   tip: { el: HTMLElement; describe: (id: string) => { name: string; detail: string } };
@@ -14,8 +14,8 @@ interface Opts {
 }
 
 /** The turntable on the landing page. Only draws while it is on screen and the tab is visible. */
-export function createShowroom(host: HTMLElement, sold: SoldMap, names: string[], { onPart, tip, onLoaded, onError }: Opts): ShowroomHandle {
-  setSold(sold); setNames(names);
+export function createShowroom(host: HTMLElement, sold: SoldMap, wall: Wall, { onPart, tip, onLoaded, onError }: Opts): ShowroomHandle {
+  setSold(sold); setWall(wall);
   const show = new Viewer(host);
   studioLights(show.scene, 1024);
   const floor = new THREE.Mesh(new THREE.CircleGeometry(4.2, 48), new THREE.MeshStandardMaterial({ color: 0x1d1b21, roughness: 1 }));
@@ -42,7 +42,7 @@ export function createShowroom(host: HTMLElement, sold: SoldMap, names: string[]
   document.addEventListener('visibilitychange', sync);
 
   return {
-    setSold, setNames,
+    setSold, setWall,
     dispose() { disposed = true; io.disconnect(); document.removeEventListener('visibilitychange', sync); show.dispose(); },
   };
 }

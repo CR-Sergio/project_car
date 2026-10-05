@@ -22,8 +22,9 @@ export interface Part {
   tam: number;
   cuadro: number;
   glass?: boolean;
-  /** 'names': no se vende a una marca; cada persona compra un nombre (el techo) */
-  kind?: 'names';
+  /** no se vende a una marca: 'messages' = cada persona compra un mensaje (salpicaderas);
+      'names' = el techo, donde van gratis los nombres de quienes dejan mensaje */
+  kind?: 'messages' | 'names';
 }
 
 type PartInput = Omit<Part, 'usd' | 'mp' | 'stripe'> & Partial<Pick<Part, 'mp' | 'stripe'>>;
@@ -31,15 +32,15 @@ const RAW: PartInput[] = [
   {id:'cofre',      name:'Cofre',                           en:'Hood',                   price:18000, zone:'Frente',    size:'≈ 115 × 150 cm', vis:9, tam:8, cuadro:9},
   {id:'parabrisas', name:'Franja del parabrisas',           en:'Windshield banner',      price:13000, zone:'Frente',    size:'≈ 130 × 20 cm',  vis:9, tam:4, cuadro:9, glass:true},
   {id:'defensa-d',  name:'Defensa delantera',               en:'Front bumper',           price:8000,  zone:'Frente',    size:'≈ 160 × 25 cm',  vis:7, tam:3, cuadro:6},
-  {id:'techo',      name:'Techo de la raza',                en:'Supporters’ roof',       price:100,   zone:'Arriba',    size:'≈ 150 × 120 cm', vis:6, tam:9, cuadro:7, kind:'names'},
+  {id:'techo',      name:'Techo de la raza',                en:'Supporters’ roof',       price:0,     zone:'Arriba',    size:'≈ 150 × 120 cm', vis:6, tam:9, cuadro:7, kind:'names'},
   {id:'puerta-di',  name:'Puerta delantera izquierda',      en:'Front left door',        price:9500,  zone:'Lado izq.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
   {id:'puerta-ti',  name:'Puerta trasera izquierda',        en:'Rear left door',         price:10500, zone:'Lado izq.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
   {id:'vidrio-ti',  name:'Ventana trasera izquierda',       en:'Rear left window',       price:7500,  zone:'Lado izq.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true},
-  {id:'salpi-i',    name:'Salpicadera delantera izquierda', en:'Front left fender',      price:7500,  zone:'Lado izq.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6},
+  {id:'salpi-i',    name:'Salpicadera de mensajes (izq.)',  en:'Message fender (left)',  price:100,   zone:'Lado izq.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6, kind:'messages'},
   {id:'puerta-dd',  name:'Puerta delantera derecha',        en:'Front right door',       price:9500,  zone:'Lado der.', size:'≈ 90 × 60 cm',   vis:8, tam:6, cuadro:8},
   {id:'puerta-td',  name:'Puerta trasera derecha',          en:'Rear right door',        price:10500, zone:'Lado der.', size:'≈ 125 × 60 cm',  vis:7, tam:7, cuadro:7},
   {id:'vidrio-td',  name:'Ventana trasera derecha',         en:'Rear right window',      price:7500,  zone:'Lado der.', size:'≈ 85 × 40 cm',   vis:7, tam:4, cuadro:6, glass:true},
-  {id:'salpi-d',    name:'Salpicadera delantera derecha',   en:'Front right fender',     price:7500,  zone:'Lado der.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6},
+  {id:'salpi-d',    name:'Salpicadera de mensajes (der.)',  en:'Message fender (right)', price:100,   zone:'Lado der.', size:'≈ 95 × 45 cm',   vis:7, tam:5, cuadro:6, kind:'messages'},
   {id:'porton',     name:'Portón trasero',                  en:'Tailgate',               price:12000, zone:'Atrás',     size:'≈ 120 × 45 cm',  vis:8, tam:6, cuadro:7},
   {id:'medallon',   name:'Medallón (vidrio trasero)',       en:'Rear window',            price:12000, zone:'Atrás',     size:'≈ 95 × 45 cm',   vis:8, tam:5, cuadro:7, glass:true},
   {id:'defensa-t',  name:'Defensa trasera',                 en:'Rear bumper',            price:8000,  zone:'Atrás',     size:'≈ 160 × 25 cm',  vis:8, tam:3, cuadro:6},
@@ -51,31 +52,53 @@ export const ZONE_EN: Record<Zone, string> = {'Frente':'Front','Arriba':'Top','L
 /** order used by the garage menu and the prev/next arrows */
 export const ORDER: Part[] = ZONES.flatMap(z => PARTS.filter(p => p.zone === z));
 export const PART_BY_ID: Record<string, Part> = Object.fromEntries(PARTS.map(p => [p.id, p]));
-/** las piezas que se venden a marcas (todas menos el techo de nombres) */
-export const BRAND_PARTS = PARTS.filter(p => p.kind !== 'names');
+/** las piezas que se venden a marcas */
+export const BRAND_PARTS = PARTS.filter(p => !p.kind);
 
-/* ===================== TECHO DE LA RAZA =====================
-   El techo no se vende a una marca: cada seguidor compra un lugar para su nombre, al precio del techo en PARTS. */
+/* ===================== MENSAJES Y TECHO DE LA RAZA =====================
+   Las salpicaderas delanteras no se venden a marcas: cada persona compra un mensaje de hasta MESSAGE_MAX
+   caracteres, al precio de la salpicadera en PARTS. De regalo, su nombre va en el techo (que ya no se vende). */
+export const MESSAGE_PARTS = PARTS.filter(p => p.kind === 'messages');
+export const MESSAGE_PRICE_MXN = MESSAGE_PARTS[0].price;
+/** caracteres por mensaje */
+export const MESSAGE_MAX = 24;
+/** mensajes que caben en cada salpicadera (≈95 × 45 cm, letras de ≈1.5-2 cm: 4 columnas × 22 renglones).
+    ≈170 entre las dos; si se rotulan más chicos caben más: sube este número. */
+export const MESSAGES_PER_PART = 85;
+export const MESSAGES_CAPACITY = MESSAGES_PER_PART * MESSAGE_PARTS.length;
+/** el techo: un nombre de regalo por cada mensaje */
 export const NAMES_PART_ID = 'techo';
-/** cuántos nombres caben en el techo (≈150 × 120 cm, letras de ≈4 cm) */
-export const NAMES_CAPACITY = 300;
-/** largo máximo de cada nombre */
 export const NAME_MAX = 22;
 
-export interface Supporter {
-  name: string;
+export interface Message {
+  text: string;
+  /** salpicadera donde va */
+  part: string;
+  /** nombre para el techo (opcional, gratis) */
+  name?: string;
   email?: string;
   news?: boolean;
   acceptedAt?: string;
 }
-/* Nombres de EJEMPLO para ver cómo se ve el techo. Bórralos al lanzar. */
-export const EXAMPLE_SUPPORTERS: Supporter[] = [
-  'Doña Lupe', 'El Primo', '@mau.mty', 'Fer y Caro', 'Tío Beto', 'La Güera', 'Chuy 81', 'Los del 13', 'Rafa G.', 'Mamá',
-  'Pollo', 'Toño Garza', '@regio.motors', 'Abuelo Chema', 'Dani', 'El Flaco', 'Sofi', 'Memo y Ana', 'Charly', 'Nacho',
-].map(name => ({ name }));
-/** nombres válidos: letras, números, espacios y . , ' & @ _ - */
-export const NAME_RE = /^[\p{L}\p{N} .,'&@_-]+$/u;
+/* Mensajes de EJEMPLO para ver cómo se ven las salpicaderas y el techo. Bórralos al lanzar. */
+export const EXAMPLE_MESSAGES: Message[] = ([
+  ['¡Arre con el project!', 'Doña Lupe'], ['Pura vida regia', 'El Primo'], ['Que ruede el 13', '@mau.mty'],
+  ['Te queremos, Palio', 'Fer y Caro'], ['De MTY pa’l mundo', 'Tío Beto'], ['Sin frenos ni miedo', 'La Güera'],
+  ['Aquí andamos, compa', 'Chuy 81'], ['Full gas siempre', 'Los del 13'], ['Echale ganas', 'Rafa G.'],
+  ['Para mi papá, que soñó', 'Mamá'], ['Vamos por el 2.0', 'Pollo'], ['Aguanta, carnal', 'Toño Garza'],
+] as const).map(([text, name], i) => ({ text, name, part: i % 2 ? 'salpi-d' : 'salpi-i' }));
+
+/** mensajes: letras, números, espacios y puntuación común (el vinil no imprime emojis) */
+export const MESSAGE_RE = /^[\p{L}\p{N} .,;:!¡?¿'’"&@#_()-]+$/u;
+/** nombres: letras, números, espacios y . , ' & @ _ - */
+export const NAME_RE = /^[\p{L}\p{N} .,'’&@_-]+$/u;
 export function cleanName(raw: string) { return raw.replace(/\s+/g, ' ').trim(); }
+export const messagesOn = (list: Message[], part: string) => list.filter(m => m.part === part);
+export const roofNames = (list: Message[]) => list.flatMap(m => (m.name ? [m.name] : []));
+/** the fender with more room left, so both fill up evenly */
+export function roomiestMessagePart(list: Message[]) {
+  return [...MESSAGE_PARTS].sort((a, b) => messagesOn(list, a.id).length - messagesOn(list, b.id).length)[0].id;
+}
 
 export interface Sale {
   brand: string;

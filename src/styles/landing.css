@@ -202,4 +202,6 @@ footer .foot-links a{color:var(--paper-2)}
 .rw-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 18px;border-bottom:3px solid var(--tape);padding-bottom:8px;margin-bottom:12px}
 .rw-head h3{font-family:var(--f-display);font-weight:400;font-size:24px;line-height:1.1;margin:0}
 .rw-head span{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#5b5560}
-.rw-names{font-family:'Permanent Marker',cursive;font-size:18px;line-height:1.55;margin:0 0 16px;max-height:9.3em;overflow:auto;overflow-wrap:anywhere}
+.rw-names{font-family:'Permanent Marker',cursive;font-size:18px;line-height:1.55;margin:0 0 10px;max-height:9.3em;overflow:auto;overflow-wrap:anywhere}
+.rw-roof{margin:0 0 16px;font-size:14px;color:#4d4752}
+.rw-roof b{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:400}

@@ -1,5 +1,5 @@
 import { Ransom } from '../../../components/Ransom';
-import { NAMES_PART_ID, PART_BY_ID } from '../../../data/parts';
+import { MESSAGE_PARTS } from '../../../data/parts';
 import { useLocale } from '../../../state/locale';
 
 export function Hero() {
@@ -9,7 +9,7 @@ export function Hero() {
       <div className="halftone-bg" aria-hidden="true" />
       <div>
         <Ransom as="h1" className="slap" es="VENDO MI CARRO EN PEDAZOS" en="SELLING MY CAR IN PIECES" seed={3} bold />
-        <p className="lede" dangerouslySetInnerHTML={{ __html: t('hero.lede', { goal: money(goal) + ' ' + cur, roof: money(priceOf(PART_BY_ID[NAMES_PART_ID])) }) }} />
+        <p className="lede" dangerouslySetInnerHTML={{ __html: t('hero.lede', { goal: money(goal) + ' ' + cur, msg: money(priceOf(MESSAGE_PARTS[0])) }) }} />
         <div className="chips">
           <span className="sticker paper">{t('chip.parts')}</span><span className="sticker paper">Fiat Palio '13</span><span className="sticker paper">{t('chip.secure')}</span>
         </div>

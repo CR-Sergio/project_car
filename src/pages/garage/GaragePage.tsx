@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useDoor } from '../../app/door';
 import { Ransom } from '../../components/Ransom';
-import { BRAND_PARTS, NAMES_CAPACITY, ORDER, PART_BY_ID, PARTS, ZONES } from '../../data/parts';
+import { BRAND_PARTS, MESSAGES_CAPACITY, MESSAGES_PER_PART, MESSAGE_MAX, ORDER, PART_BY_ID, PARTS, ZONES, roomiestMessagePart } from '../../data/parts';
 import { REDUCED } from '../../lib/motion';
 import { useLocale } from '../../state/locale';
 import { useSales } from '../../state/sales';
@@ -20,9 +20,8 @@ export default function GaragePage() {
   const navigate = useNavigate();
   const door = useDoor();
   const { t, cur, money, goal, nameOf, zoneOf, priceOf } = useLocale();
-  const { sold, supporters, raisedIn } = useSales();
-  const names = useMemo(() => supporters.map(x => x.name), [supporters]);
-  const roofFull = names.length >= NAMES_CAPACITY;
+  const { sold, messages, wall, raisedIn } = useSales();
+  const wallFull = messages.length >= MESSAGES_CAPACITY;
   const selected = partId && PART_BY_ID[partId] ? partId : (lastPart ?? ORDER[0].id);
   const [buying, setBuying] = useState<string | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
@@ -44,7 +43,7 @@ export default function GaragePage() {
 
   // the 3D scene lives as long as the page (layout effect: it must exist before the first part is picked below)
   useLayoutEffect(() => {
-    handle.current = createGarage(stage.current!, sold, names, {
+    handle.current = createGarage(stage.current!, sold, wall, {
       onPart: id => selectRef.current(id),
       onLoaded: () => setStatus('ready'),
       onError: () => setStatus('error'),
@@ -53,7 +52,7 @@ export default function GaragePage() {
     // sold changes are pushed by the effect below
   }, []);
   useEffect(() => { handle.current?.setSold(sold); }, [sold]);
-  useEffect(() => { handle.current?.setNames(names); }, [names]);
+  useEffect(() => { handle.current?.setWall(wall); }, [wall]);
 
   // picking a part: camera flies there, card swaps in, bars fill up
   useLayoutEffect(() => {
@@ -76,15 +75,18 @@ export default function GaragePage() {
     if (e.key === 'Escape') { e.preventDefault(); leave(); }
     else if (e.key === 'ArrowDown' || e.key === 'ArrowRight') { e.preventDefault(); step(1); focusCurrent(); }
     else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') { e.preventDefault(); step(-1); focusCurrent(); }
-    else if (e.key === 'Enter' && (e.target as Element).closest?.('.g-item')) { e.preventDefault(); if (canBuy) setBuying(selected); }
+    else if (e.key === 'Enter' && (e.target as Element).closest?.('.g-item')) { e.preventDefault(); if (canBuy) setBuying(buyTarget); }
   };
   useEffect(() => {
     const on = (e: KeyboardEvent) => keys.current(e);
     addEventListener('keydown', on); return () => removeEventListener('keydown', on);
   }, []);
 
-  const p = PART_BY_ID[selected], isNames = p.kind === 'names', s = isNames ? undefined : sold[selected], idx = ORDER.indexOf(p);
-  const canBuy = isNames ? !roofFull : !s;
+  const p = PART_BY_ID[selected], isRoof = p.kind === 'names', isMsgs = p.kind === 'messages', s = p.kind ? undefined : sold[selected], idx = ORDER.indexOf(p);
+  const here = isMsgs ? wall.byPart[p.id] ?? [] : [], partFull = here.length >= MESSAGES_PER_PART;
+  // buying from the roof leaves a message on whichever fender has more room
+  const buyTarget = isRoof ? roomiestMessagePart(messages) : selected;
+  const canBuy = isRoof ? !wallFull : isMsgs ? !partFull : !s;
   const raised = raisedIn(cur), pct = Math.min(100, raised / goal * 100), n = Object.keys(sold).length;
   const closeCheckout = useCallback(() => setBuying(null), []);
 
@@ -100,7 +102,7 @@ export default function GaragePage() {
         <div className="g-meta">
           <div><b>{money(raised)}</b> <span>{t('ofGoal', { g: money(goal) })}</span></div>
           <div className="g-track"><div style={{ width: pct + '%' }} /></div>
-          <div className="g-sub">{t('soldOf', { n, N: BRAND_PARTS.length })} · {t('namesCount', { k: names.length })}</div>
+          <div className="g-sub">{t('soldOf', { n, N: BRAND_PARTS.length })} · {t('msgCount', { k: messages.length })}</div>
         </div>
       </header>
       <nav className="g-menu" ref={menu} aria-label="Piezas del carro">
@@ -108,12 +110,13 @@ export default function GaragePage() {
           <div className="g-zone" key={z}>
             <div className="g-zlabel">{zoneOf(z)}</div>
             {PARTS.filter(q => q.zone === z).map(q => {
-              const qn = q.kind === 'names', qs = qn ? undefined : sold[q.id];
+              const qs = q.kind ? undefined : sold[q.id];
+              const pr = q.kind === 'names' ? t('roofFree') : q.kind === 'messages' ? t('perName', { p: money(priceOf(q)) }) : qs ? t('soldL') : money(priceOf(q));
               return (
-                <button key={q.id} className={'g-item' + (qs ? ' sold' : '') + (qn ? ' names' : '')} aria-current={q.id === selected} onClick={() => select(q.id)}>
+                <button key={q.id} className={'g-item' + (qs ? ' sold' : '') + (q.kind ? ' names' : '')} aria-current={q.id === selected} onClick={() => select(q.id)}>
                   <span className="in">
-                    <i className="chip" style={{ background: qn ? '#f1c232' : qs ? qs.color : '#ddd6c6' }} />
-                    <span className="nm">{nameOf(q)}</span><span className="pr">{qn ? t('perName', { p: money(priceOf(q)) }) : qs ? t('soldL') : money(priceOf(q))}</span>
+                    <i className="chip" style={{ background: q.kind ? '#f1c232' : qs ? qs.color : '#ddd6c6' }} />
+                    <span className="nm">{nameOf(q)}</span><span className="pr">{pr}</span>
                   </span>
                 </button>
               );
@@ -125,20 +128,23 @@ export default function GaragePage() {
         <span className="tape" aria-hidden="true" />
         <div className="g-eyebrow">{t('piece', { z: zoneOf(p.zone), i: idx + 1, N: ORDER.length })}</div>
         <h3>{nameOf(p)}</h3>
-        <div className="g-price">{money(priceOf(p))} <small>{cur}{isNames ? ' ' + t('eachName') : ''}</small></div>
-        {isNames
-          ? <div className="g-status free">{t('namesOf', { k: names.length, cap: NAMES_CAPACITY })}</div>
-          : <div className={'g-status ' + (s ? 'sold' : 'free')}>{s ? t('soldTo', { b: s.brand }) : t('free')}</div>}
-        {isNames && <p className="g-names">{t('namesPitch')} {names.length > 0 && <><br /><b>{t('namesLast')}</b> {names.slice(-5).reverse().join(' · ')}</>}</p>}
+        {isRoof
+          ? <div className="g-price">{t('roofFree')} <small>{t('roofWith')}</small></div>
+          : <div className="g-price">{money(priceOf(p))} <small>{cur}{isMsgs ? ' ' + t('each') : ''}</small></div>}
+        {isRoof && <div className="g-status free">{t('namesCount', { k: wall.names.length })}</div>}
+        {isMsgs && <div className="g-status free">{t('msgOf', { k: here.length, cap: MESSAGES_PER_PART })}</div>}
+        {!p.kind && <div className={'g-status ' + (s ? 'sold' : 'free')}>{s ? t('soldTo', { b: s.brand }) : t('free')}</div>}
+        {isRoof && <p className="g-names">{t('roofPitch')} {wall.names.length > 0 && <><br /><b>{t('roofLast')}</b> {wall.names.slice(-5).reverse().join(' · ')}</>}</p>}
+        {isMsgs && <p className="g-names">{t('msgPitch', { max: MESSAGE_MAX })} {here.length > 0 && <><br /><b>{t('msgLast')}</b> {here.slice(-3).reverse().map(m => `“${m}”`).join(' · ')}</>}</p>}
         <div className="g-statlist">
           {STATS.map(k => (
             <div className="stat" key={k}><span>{t(k)}</span><div className="segs" data-v={p[k]}>{Array.from({ length: 10 }, (_, i) => <i key={i} />)}</div><b>{p[k]}</b></div>
           ))}
         </div>
-        <dl className="g-spec"><dt>{t('area')}</dt><dd>{p.size}</dd><dt>{t('incl')}</dt><dd>{isNames ? t('namesIncl') : t('inclTxt')}</dd></dl>
+        <dl className="g-spec"><dt>{t('area')}</dt><dd>{p.size}</dd><dt>{t('incl')}</dt><dd>{isRoof ? t('roofIncl') : isMsgs ? t('msgIncl') : t('inclTxt')}</dd></dl>
         <div className="g-actions">
           <button className="g-arrow" aria-label={t('prev')} onClick={() => step(-1)}>◀</button>
-          <button className="btn" disabled={!canBuy} onClick={() => setBuying(selected)}>{isNames ? (roofFull ? t('namesFull') : t('addName')) : s ? t('taken') : t('buy')}</button>
+          <button className="btn" disabled={!canBuy} onClick={() => setBuying(buyTarget)}>{p.kind ? (canBuy ? t('addMsg') : t('msgFull')) : s ? t('taken') : t('buy')}</button>
           <button className="g-arrow" aria-label={t('next')} onClick={() => step(1)}>▶</button>
         </div>
         <p className="g-fine">{t('fine')}</p>

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Ransom } from '../../../components/Ransom';
-import { NAMES_CAPACITY, NAMES_PART_ID, PART_BY_ID } from '../../../data/parts';
+import { MESSAGES_CAPACITY, MESSAGE_PARTS, PART_BY_ID, roomiestMessagePart } from '../../../data/parts';
 import { useLocale } from '../../../state/locale';
 import { useSales } from '../../../state/sales';
 import type { ShowroomHandle } from '../../../three/showroom';
@@ -11,15 +11,14 @@ export const prefetchShowroom = () => loadShowroom().then(m => m.prefetch());
 
 export function Showroom({ onEnter }: { onEnter: (id?: string) => void }) {
   const { t, nameOf, money, priceOf } = useLocale();
-  const { sold, supporters } = useSales();
-  const names = useMemo(() => supporters.map(x => x.name), [supporters]);
+  const { sold, messages, wall } = useSales();
   const stage = useRef<HTMLDivElement>(null);
   const tip = useRef<HTMLDivElement>(null);
   const handle = useRef<ShowroomHandle | null>(null);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   // latest values for callbacks living inside the 3D module
-  const live = useRef({ sold, names, onEnter, t, nameOf, money, priceOf });
-  live.current = { sold, names, onEnter, t, nameOf, money, priceOf };
+  const live = useRef({ sold, wall, onEnter, t, nameOf, money, priceOf });
+  live.current = { sold, wall, onEnter, t, nameOf, money, priceOf };
 
   useEffect(() => {
     const host = stage.current!; let cancelled = false;
@@ -27,13 +26,14 @@ export function Showroom({ onEnter }: { onEnter: (id?: string) => void }) {
       io.disconnect();
       loadShowroom().then(({ createShowroom }) => {
         if (cancelled) return;
-        handle.current = createShowroom(host, live.current.sold, live.current.names, {
+        handle.current = createShowroom(host, live.current.sold, live.current.wall, {
           onPart: id => live.current.onEnter(id),
           tip: {
             el: tip.current!,
             describe: id => {
               const { sold, t, nameOf, money, priceOf } = live.current, p = PART_BY_ID[id];
-              if (p.kind === 'names') return { name: nameOf(p), detail: t('perName', { p: money(priceOf(p)) }) };
+              if (p.kind === 'names') return { name: nameOf(p), detail: `${t('roofFree')} ${t('roofWith')}` };
+              if (p.kind === 'messages') return { name: nameOf(p), detail: t('perName', { p: money(priceOf(p)) }) };
               return { name: nameOf(p), detail: sold[id] ? t('soldL') : money(priceOf(p)) };
             },
           },
@@ -48,7 +48,7 @@ export function Showroom({ onEnter }: { onEnter: (id?: string) => void }) {
   }, []);
 
   useEffect(() => { handle.current?.setSold(sold); }, [sold]);
-  useEffect(() => { handle.current?.setNames(names); }, [names]);
+  useEffect(() => { handle.current?.setWall(wall); }, [wall]);
 
   return (
     <section id="garage">
@@ -76,10 +76,11 @@ export function Showroom({ onEnter }: { onEnter: (id?: string) => void }) {
         <span className="tape" aria-hidden="true" />
         <div className="rw-head">
           <h3>{t('rw.title')}</h3>
-          <span>{t('namesOf', { k: names.length, cap: NAMES_CAPACITY })}</span>
+          <span>{t('msgOf', { k: messages.length, cap: MESSAGES_CAPACITY })}</span>
         </div>
-        <p className="rw-names">{names.length ? names.join(' · ') : t('rw.empty')}</p>
-        <button className="btn" type="button" onClick={() => onEnter(NAMES_PART_ID)}>{t('rw.cta', { p: money(priceOf(PART_BY_ID[NAMES_PART_ID])) })}</button>
+        <p className="rw-names">{messages.length ? messages.map(m => `“${m.text}”${m.name ? ' — ' + m.name : ''}`).join(' · ') : t('rw.empty')}</p>
+        {wall.names.length > 0 && <p className="rw-roof"><b>{t('rw.roof')}</b> {t('namesCount', { k: wall.names.length })}</p>}
+        <button className="btn" type="button" onClick={() => onEnter(roomiestMessagePart(messages))}>{t('rw.cta', { p: money(priceOf(MESSAGE_PARTS[0])) })}</button>
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { NAMES_CAPACITY, PALIO_ASPECT, PARTS, PART_BY_ID, type SoldMap } from '../data/parts';
+import { MESSAGES_CAPACITY, MESSAGES_PER_PART, PALIO_ASPECT, PARTS, PART_BY_ID, type SoldMap } from '../data/parts';
 import { brandCanvas } from '../lib/brandCanvas';
 import { namesCanvas } from '../lib/namesCanvas';
 
@@ -26,15 +26,21 @@ for (const p of PARTS) panels[p.id] = {
 };
 
 /* what the parts show: sales, the part picked in the garage, the part under the mouse */
-const state: { sold: SoldMap; names: string[]; selected: string | null; hovered: string | null } = { sold: {}, names: [], selected: null, hovered: null };
+export interface Wall { byPart: Record<string, string[]>; names: string[] }
+const state: { sold: SoldMap; wall: Wall; selected: string | null; hovered: string | null } = { sold: {}, wall: { byPart: {}, names: [] }, selected: null, hovered: null };
 export const paintState = state as Readonly<typeof state>;
 
 export function paint(id: string) {
   const P = panels[id]; if (!P) return; const m = P.mat, s = state.sold[id];
   if (m.map) { m.map.dispose(); m.map = null; }
-  if (PART_BY_ID[id]?.kind === 'names') {
-    // the supporters' roof always shows its sheet of names (hi-res: the letters are small)
-    const a = Math.max(.5, Math.min(7, P.aspect)), tex = new THREE.CanvasTexture(namesCanvas(state.names, NAMES_CAPACITY, 1024, Math.round(1024 / a)));
+  const kind = PART_BY_ID[id]?.kind;
+  if (kind) {
+    // community parts always show their sheet: names on the roof (one per message), messages on the fenders (hi-res: small letters)
+    const a = Math.max(.5, Math.min(7, P.aspect)), w = 1024, h = Math.round(w / a);
+    const c = kind === 'names'
+      ? namesCanvas(state.wall.names, MESSAGES_CAPACITY, w, h)
+      : namesCanvas(state.wall.byPart[id] ?? [], MESSAGES_PER_PART, w, h, 'MENSAJES DE LA RAZA', undefined, 11);
+    const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace; tex.flipY = false; tex.anisotropy = 8; m.map = tex; m.color.set(0xffffff);
   } else if (s) {
     const a = Math.max(.5, Math.min(7, P.aspect)); const tex = new THREE.CanvasTexture(brandCanvas(s, 512, Math.round(512 / a)));
@@ -49,9 +55,9 @@ export function setSold(sold: SoldMap) {
   const changed = PARTS.filter(p => state.sold[p.id] !== sold[p.id]).map(p => p.id);
   state.sold = sold; changed.forEach(paint);
 }
-export function setNames(names: string[]) {
-  if (names.length === state.names.length && names.every((n, i) => n === state.names[i])) return;
-  state.names = names; PARTS.filter(p => p.kind === 'names').forEach(p => paint(p.id));
+export function setWall(wall: Wall) {
+  if (wall === state.wall) return;
+  state.wall = wall; PARTS.filter(p => p.kind).forEach(p => paint(p.id));
 }
 export function setSelected(id: string | null) {
   const prev = state.selected; if (prev === id) return;

@@ -19,7 +19,7 @@ export default function PrivacyPage() {
       <ul>
         <li><strong>Identificación y contacto:</strong> nombre de tu marca, correo electrónico y, si lo das, tu Instagram o sitio web.</li>
         <li><strong>Contenido de tu marca:</strong> el logo y el color que subes para rotular la pieza.</li>
-        <li><strong>Nombre para el techo (si compras un lugar):</strong> el nombre, apodo o usuario que quieres que aparezca. Si es de otra persona, declaras tener su permiso.</li>
+        <li><strong>Mensaje y nombre de regalo (si compras un mensaje):</strong> el texto de tu mensaje y el nombre, apodo o usuario que quieres que aparezca en el techo. Si el nombre es de otra persona, declaras tener su permiso.</li>
         <li><strong>De la operación:</strong> pieza comprada, monto, fecha y folio del pago, y la fecha y hora en que aceptaste los términos, este aviso y la política de no reembolsos.</li>
       </ul>
       <p>
@@ -32,7 +32,7 @@ export default function PrivacyPage() {
       <ol>
         <li>Registrar tu compra y confirmar el pago.</li>
         <li>Diseñar, imprimir, instalar y, al terminar la vigencia, retirar el vinil con tu marca.</li>
-        <li>Publicar tu marca y tu logo, o el nombre que elegiste para el techo, en el carro, en los videos del canal, en el sitio y en redes sociales, como parte del servicio que contratas.</li>
+        <li>Publicar tu marca y tu logo, o tu mensaje y el nombre que elegiste para el techo, en el carro, en los videos del canal, en el sitio y en redes sociales, como parte del servicio que contratas.</li>
         <li>Contactarte sobre tu pieza (aprobación del diseño, fechas de instalación, cambios).</li>
         <li>Cumplir obligaciones legales y fiscales, y conservar la evidencia de la operación.</li>
         <li>Atender aclaraciones, contracargos y solicitudes de derechos ARCO.</li>

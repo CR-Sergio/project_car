@@ -1,13 +1,13 @@
 import { Link } from 'react-router';
 import { LEGAL, RESTRICTED } from '../../data/legal';
-import { NAME_MAX, NAMES_CAPACITY, NAMES_PART_ID, PART_BY_ID } from '../../data/parts';
+import { MESSAGES_CAPACITY, MESSAGE_MAX, MESSAGE_PRICE_MXN, NAME_MAX } from '../../data/parts';
 import { LegalLayout, V } from './LegalLayout';
 
 /* Términos y Condiciones de contratación de espacio publicitario.
    Escritos con base en contratos de publicidad en vehículos y de patrocinio que ya se usan en el mercado,
    ajustados a la ley mexicana. Base para que la revise un abogado antes de cobrar. */
 export default function TermsPage() {
-  const L = LEGAL, roofPrice = PART_BY_ID[NAMES_PART_ID].price.toLocaleString('es-MX');
+  const L = LEGAL, msgPrice = MESSAGE_PRICE_MXN.toLocaleString('es-MX');
   let n = 0; const H = ({ children }: { children: string }) => <h2><span className="n">{++n}.</span>{children}</h2>;
   return (
     <LegalLayout title="TERMINOS Y CONDICIONES" titleEn="TERMS AND CONDITIONS" seed={43} stamp="LÉASE CON CALMA">
@@ -27,7 +27,8 @@ export default function TermsPage() {
       <ul>
         <li><strong>Vehículo:</strong> el Fiat Palio 2013 del proyecto, propiedad de Proyect Car.</li>
         <li><strong>Pieza:</strong> la parte del Vehículo que eliges (cofre, puerta, ventana, etc.) y su área aproximada indicada en el sitio.</li>
-        <li><strong>Techo de la raza:</strong> el techo del Vehículo, que no se vende a marcas: en él se rotulan nombres de personas que apoyan el proyecto (cláusula 13). Comprar un lugar ahí es comprar un <strong>Nombre</strong>.</li>
+        <li><strong>Mensaje:</strong> un texto corto que compras para que se rotule en una de las salpicaderas delanteras, que no se venden a marcas (cláusula 13).</li>
+        <li><strong>Nombre de regalo:</strong> el nombre que, sin costo adicional, rotulamos en el techo del Vehículo por cada Mensaje (cláusula 13).</li>
         <li><strong>Servicio:</strong> apartar la Pieza para tu marca, diseñar el arte sobre ella, imprimir e instalar el vinil, mostrarlo durante la Vigencia y retirarlo al final.</li>
         <li><strong>Vigencia:</strong> el tiempo que tu vinil se queda instalado (cláusula 8).</li>
         <li><strong>Contenido:</strong> los videos, fotos y publicaciones del proyecto en el sitio y en redes sociales.</li>
@@ -134,16 +135,17 @@ export default function TermsPage() {
         <li>Si el Vehículo sufre un siniestro, robo o pérdida total, o deja de poder circular por causas ajenas a nosotros, a nuestra elección podemos rotular tu marca en otro vehículo del proyecto por el resto de la Vigencia, o seguir mostrándola en el Contenido por ese mismo tiempo. Esto no da lugar a reembolso.</li>
       </ul>
 
-      <H>Nombres en el techo</H>
-      <p>Si compras un Nombre en el Techo de la raza, además de lo anterior aplica lo siguiente:</p>
+      <H>Mensajes en las salpicaderas y nombres en el techo</H>
+      <p>Si compras un Mensaje, además de lo anterior aplica lo siguiente:</p>
       <ul>
-        <li>Cada Nombre cuesta ${roofPrice} pesos, precio final, y es un servicio: rotular un nombre en el techo y mostrarlo en el Contenido. No es una donación ni da derecho a nada más.</li>
-        <li>El Nombre puede ser el nombre, apodo o usuario de redes de una persona, de hasta {NAME_MAX} caracteres. No se aceptan marcas ni negocios (para eso están las Piezas), groserías, insultos, contenido político, sexual o discriminatorio, ni datos personales como teléfonos o direcciones.</li>
-        <li>Si el Nombre no es el tuyo, declaras que tienes permiso de esa persona para publicarlo; si es menor de edad, el permiso de quien ejerza la patria potestad. Respondes por cualquier reclamo de esa persona.</li>
-        <li>Podemos abreviar o ajustar la ortografía del Nombre para que quepa y se lea. Si no lo aceptamos, puedes proponer otro dentro de 10 días hábiles; si tampoco procede, te devolvemos lo pagado menos la comisión de la pasarela.</li>
-        <li>Caben hasta {NAMES_CAPACITY} Nombres. Los rotulamos por tandas, al menos una vez al mes mientras haya Nombres pendientes, y nosotros decidimos el lugar, tamaño, color y tipo de letra de cada uno. Las letras son chicas: no garantizamos que tu Nombre se lea en todos los videos o tomas.</li>
-        <li>Tu Nombre se queda en el techo al menos {L.vigenciaMeses} meses desde que se instala su tanda, y también aparece en la lista de nombres del sitio. Al terminar podemos retirarlo o dejarlo, sin obligación.</li>
-        <li>Puedes comprar varios Nombres; cada uno se paga por separado. Todas las compras de Nombres son finales, conforme a la cláusula 7.</li>
+        <li>Cada Mensaje cuesta ${msgPrice} pesos, precio final, y es un servicio: rotular tu texto en una salpicadera delantera y mostrarlo en el Contenido. No es una donación ni da derecho a nada más.</li>
+        <li>El Mensaje puede tener hasta {MESSAGE_MAX} caracteres, contando espacios. No se aceptan marcas, negocios, anuncios, promociones, enlaces, teléfonos ni redes de negocios (para eso están las Piezas), ni groserías, insultos, contenido político, sexual, religioso ofensivo o discriminatorio, ni datos personales de terceros.</li>
+        <li><strong>Nombre de regalo:</strong> por cada Mensaje puedes pedir, sin costo adicional, que pongamos en el techo un nombre, apodo o usuario de una persona, de hasta {NAME_MAX} caracteres. Es una cortesía: no forma parte del precio, es opcional y no genera reembolso si no se puede poner. Si el nombre no es el tuyo, declaras que tienes permiso de esa persona (o de quien ejerza la patria potestad, si es menor de edad) y respondes por cualquier reclamo suyo.</li>
+        <li>Podemos ajustar mayúsculas, acentos u ortografía para que el texto quepa y se lea. Si no aceptamos tu Mensaje, puedes proponer otro dentro de 10 días hábiles; si tampoco procede, te devolvemos lo pagado menos la comisión de la pasarela. Si no aceptamos el Nombre de regalo, puedes proponer otro o dejarlo sin nombre.</li>
+        <li>Caben alrededor de {MESSAGES_CAPACITY} Mensajes entre las dos salpicaderas. Al llenarse, se cierra la venta. Los rotulamos por tandas, al menos una vez al mes mientras haya Mensajes pendientes, y nosotros decidimos en qué salpicadera, en qué lugar y con qué tamaño, color y tipo de letra va cada uno.</li>
+        <li><strong>Las letras son chicas</strong> (de uno a dos centímetros): no garantizamos que tu Mensaje o tu Nombre de regalo se lean en todos los videos o tomas, ni desde lejos.</li>
+        <li>Tu Mensaje y tu Nombre de regalo se quedan al menos {L.vigenciaMeses} meses desde que se instala su tanda, y también aparecen en la lista de mensajes del sitio. Al terminar podemos retirarlos o dejarlos, sin obligación.</li>
+        <li>Puedes comprar varios Mensajes; cada uno se paga por separado. Todas las compras de Mensajes son finales, conforme a la cláusula 7.</li>
       </ul>
 
       <H>Caso fortuito, fuerza mayor y plataformas</H>
