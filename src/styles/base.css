@@ -46,6 +46,26 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 70% 55% at 50% 18%,rgba(255,236,200,.05),transparent 60%),radial-gradient(ellipse 120% 90% at 50% 40%,transparent 45%,rgba(0,0,0,.72) 100%)}
 #graffiti .buff{position:absolute;background:#2f2e33;opacity:.55;box-shadow:inset 0 0 40px rgba(0,0,0,.35)}
 #graffiti .tag{text-shadow:0 0 3px currentColor,0 0 22px rgba(0,0,0,.6);filter:blur(.3px)}
+/* street layer: wheat-pasted posters, sticker slaps, a stencil, paint drips and overspray (all placed by <Graffiti/>) */
+#graffiti .mist{position:absolute;border-radius:50%;background:radial-gradient(closest-side,currentColor,transparent);opacity:.1}
+#graffiti .drip{position:absolute;top:82%;width:.05em;min-width:3px;background:currentColor;border-radius:0 0 3px 3px}
+#graffiti .drip::after{content:"";position:absolute;left:50%;bottom:-.06em;width:.1em;min-width:6px;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:currentColor}
+#graffiti .poster{position:absolute;display:grid;place-content:center;text-align:center;line-height:.92;padding:.5em .6em;color:var(--ink);
+  background-color:#e6dfcc;background-image:linear-gradient(170deg,transparent 55%,rgba(60,45,20,.28)),url(/img/paper.webp);background-size:auto,420px auto;background-blend-mode:normal,multiply;
+  clip-path:var(--torn);box-shadow:inset 0 0 30px rgba(70,55,30,.35);filter:saturate(.75) brightness(.82)}
+#graffiti .poster b{display:block;font-family:'Bowlby One',Impact,sans-serif;font-weight:400;letter-spacing:.01em}
+#graffiti .poster i{display:block;font-family:'Special Elite',monospace;font-style:normal;font-size:.32em;margin-top:.5em;letter-spacing:.04em}
+#graffiti .poster::after{content:"";position:absolute;right:0;top:0;width:22%;aspect-ratio:1;background:linear-gradient(225deg,#2c2b30 49%,#d8d0bb 51%,#a99f88);box-shadow:-3px 3px 6px rgba(0,0,0,.4)}
+#graffiti .poster.flat::after{display:none}
+#graffiti .slap{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1;box-shadow:1px 2px 0 rgba(0,0,0,.45);filter:saturate(.85) brightness(.88)}
+#graffiti .slap.hello{background:#d9252e;color:#fff;border-radius:6px;padding:4px 4px 6px;width:9em;text-align:center;font-size:9px;letter-spacing:.08em}
+#graffiti .slap.hello span{display:block;background:#f4f0e6;color:#1d4fb8;font-family:'Permanent Marker',cursive;font-weight:400;font-size:2.3em;letter-spacing:0;padding:6px 0 4px;margin-top:4px;border-radius:2px}
+#graffiti .slap.dot{width:4.2em;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-family:'Bowlby One',sans-serif;font-weight:400;font-size:14px;border:3px solid currentColor}
+#graffiti .slap.tagbox{padding:5px 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:2px solid #141214}
+#graffiti .slap.check{width:7em;height:1.6em;font-size:12px;background:conic-gradient(#141214 25%,#ece6d6 0 50%,#141214 0 75%,#ece6d6 0) 0 0/12px 12px}
+#graffiti .stencil-car{position:absolute;aspect-ratio:5/2;background:currentColor;filter:drop-shadow(0 0 7px currentColor);
+  -webkit-mask:var(--car) center/contain no-repeat;mask:var(--car) center/contain no-repeat}
+#graffiti .stencil-txt{position:absolute;font-family:'Rubik Mono One',monospace;letter-spacing:.2em;white-space:nowrap}
 
 /* ---------- ransom letters ---------- */
 .ransom{display:flex;flex-wrap:wrap;align-items:center;gap:.06em .02em;line-height:1;margin:0;font-weight:400}
