@@ -13,7 +13,7 @@ La página ya **no habla de IVA ni de factura**: los precios son finales. Aun as
 
 ### Números internos (no se muestran en la página)
 
-Meta pública: **$150,000 MXN**. Precios de las 15 piezas: suman $159,000.
+Meta pública: **$150,000 MXN**. Las 14 piezas para marcas suman $141,000; el techo lleno (300 nombres × $100) agrega hasta $30,000. Para llegar a la meta vendiendo todas las piezas hacen falta 90 nombres.
 
 | Concepto | Estimado |
 |---|---|
@@ -21,7 +21,7 @@ Meta pública: **$150,000 MXN**. Precios de las 15 piezas: suman $159,000.
 | Comisión de pasarela (≈3.6% + $3 por pago) | ≈ $5,450 sobre $150,000 |
 | **Te quedaría para el carro, vendiendo $150,000** | **≈ $127,000** antes de impuestos |
 
-Vinil por pieza: cofre $2,450 · techo $2,550 · franja del parabrisas $750 · defensas $900 c/u · puertas delanteras $1,050 c/u ·
+Vinil por pieza: cofre $2,450 · techo de nombres $2,550 por plancha · franja del parabrisas $750 · defensas $900 c/u · puertas delanteras $1,050 c/u ·
 puertas traseras (con costado) $1,300 c/u · ventanas traseras $750 c/u · salpicaderas $950 c/u · portón $1,050 · medallón $850.
 Cotiza con 2 o 3 talleres para confirmarlo.
 
@@ -43,13 +43,21 @@ Cotiza con 2 o 3 talleres para confirmarlo.
 - [ ] Antes de lanzar, borrar las ventas de ejemplo (`EXAMPLE_SOLD` en `src/data/parts.ts`) y cambiar el pie de página de "página de prueba".
 - [ ] Siguiente paso técnico: backend con webhook para marcar piezas vendidas, apartar la pieza mientras alguien paga y guardar los datos del checkout (hoy se pierden al recargar).
 
-## 4. El carro en la calle
+## 4. Techo de la raza (nombres a $100)
+
+- [ ] Antes de cobrar en real, el techo **necesita el backend**: con un Payment Link fijo el nombre que escribe la persona no te llega. Opciones rápidas: un formulario (Google Forms / Tally) que pida nombre + folio del pago, o el webhook de la pasarela.
+- [ ] Revisar cada nombre antes de imprimir (sin marcas, groserías, política ni datos personales) y guardar el correo de confirmación.
+- [ ] Imprimir por tandas, al menos una vez al mes mientras haya nombres pendientes (así lo dicen los términos, cláusula 13). Lo más barato es vinil de corte o impresión de una plancha nueva del techo cada tanda; cotízalo.
+- [ ] Ojo con la comisión: en $100 la pasarela se lleva ≈$7 (≈7%). Si quieres, ofrece paquetes (3 nombres por $250) para bajarla.
+- [ ] Borrar `EXAMPLE_SUPPORTERS` en `src/data/parts.ts` antes de lanzar.
+
+## 5. El carro en la calle
 
 - [ ] Avisar a tu aseguradora que el carro va rotulado y se usa para publicidad; confirmar que la póliza sigue cubriendo.
 - [ ] Vidrios: usar **vinil microperforado** en medallón y ventanas traseras. En el parabrisas, solo la franja superior. Confirmar con el Reglamento de Tránsito de Monterrey / Nuevo León.
 - [ ] Preguntar en Desarrollo Urbano del municipio de Monterrey si la publicidad en un vehículo particular necesita permiso de anuncios.
 
-## 5. Contenido y redes
+## 6. Contenido y redes
 
 - [ ] Marcar cada video con pieza pagada como **promoción pagada** en YouTube, TikTok e Instagram.
 - [ ] Revisar cada marca antes de rotularla (lista de marcas no aceptadas en `src/data/legal.ts`, `RESTRICTED`). Alcohol, medicamentos y suplementos necesitan permiso de publicidad de COFEPRIS; mejor no aceptarlos.
