@@ -1,0 +1,41 @@
+{
+  "name": "proyect-car",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@fontsource/abril-fatface": "5.3.0",
+    "@fontsource/alfa-slab-one": "5.3.0",
+    "@fontsource/archivo": "5.3.0",
+    "@fontsource/bowlby-one": "5.3.0",
+    "@fontsource/bungee": "5.3.0",
+    "@fontsource/jetbrains-mono": "5.3.0",
+    "@fontsource/permanent-marker": "5.3.0",
+    "@fontsource/rubik-mono-one": "5.3.0",
+    "@fontsource/rubik-wet-paint": "5.3.0",
+    "@fontsource/sedgwick-ave-display": "5.3.0",
+    "@fontsource/special-elite": "5.3.0",
+    "@fontsource/tinos": "5.3.0",
+    "@fontsource/unifrakturmaguntia": "5.3.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-router": "7.18.4",
+    "three": "0.160.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "@types/three": "0.160.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vitest": "3.2.7"
+  }
+}

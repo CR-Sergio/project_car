@@ -1,0 +1,88 @@
+/* ---------- the garage screen ---------- */
+html.in-garage,html.in-garage body{overflow:hidden}
+#taller{position:fixed;inset:0;z-index:90;background:#0b0a0d;color:var(--paper);overflow:hidden;font-family:var(--f-body)}
+.g-stage{position:absolute;inset:0}
+.g-stage canvas{display:block;width:100%;height:100%;cursor:grab}
+.g-stage canvas.hovering{cursor:pointer}
+.g-shade{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(90deg,rgba(8,7,10,.88) 0,rgba(8,7,10,.35) 26%,transparent 42%,transparent 62%,rgba(8,7,10,.4) 74%,rgba(8,7,10,.9) 100%),
+             linear-gradient(180deg,rgba(8,7,10,.75) 0,transparent 18%,transparent 82%,rgba(8,7,10,.85) 100%),
+             repeating-linear-gradient(0deg,rgba(255,255,255,.018) 0 1px,transparent 1px 3px)}
+.g-top{position:absolute;left:0;right:0;top:0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:calc(16px + env(safe-area-inset-top,0px)) 24px 0}
+.g-top h2{font-size:clamp(26px,3.6vw,44px);rotate:-1.5deg}
+.g-back{font:inherit;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;background:none;border:0;color:var(--paper);cursor:pointer;display:flex;gap:8px;align-items:center;padding:8px 0}
+.g-back:hover{color:var(--tape)}
+.key{display:inline-grid;place-items:center;min-width:26px;height:24px;padding:0 6px;font-family:var(--f-mono);font-size:11px;color:var(--ink);background:var(--paper);
+  border-radius:4px;box-shadow:0 3px 0 #8c8579,0 4px 6px rgba(0,0,0,.5);text-transform:none;letter-spacing:0}
+.g-meta{text-align:right;font-family:var(--f-mono);font-size:12px;min-width:200px}
+.g-meta b{font-family:var(--f-display);font-weight:400;font-size:24px;color:var(--tape)}
+.g-track{height:8px;background:#2a282e;margin:6px 0 4px;border:1px solid #3a373f}
+.g-track div{height:100%;width:0;background:repeating-linear-gradient(-45deg,var(--race) 0 8px,#c41d25 8px 16px);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.g-sub{color:var(--muted)}
+.g-menu{position:absolute;left:24px;top:130px;bottom:84px;width:min(300px,30vw);overflow:auto;padding:4px 8px 4px 2px;scrollbar-width:thin}
+.g-zone{margin-bottom:14px}
+.g-zlabel{font-family:var(--f-type);font-size:15px;color:var(--tape);margin:0 0 6px 4px}
+.g-item{display:block;width:100%;font:inherit;text-align:left;border:0;padding:0;margin:0 0 5px;background:none;color:var(--paper);cursor:pointer;transform:skewX(-10deg)}
+.g-item .in{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;background:rgba(30,28,34,.82);border-left:3px solid transparent;
+  transform:skewX(10deg);transition:background .15s,transform .15s}
+.g-item .chip{width:12px;height:12px;border:1px solid #0008}
+.g-item .nm{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g-item .pr{font-family:var(--f-mono);font-size:12px;color:var(--paper-2);font-variant-numeric:tabular-nums}
+.g-item:hover .in{background:rgba(52,48,58,.9)}
+.g-item[aria-current="true"] .in{background:var(--tape);color:var(--ink);border-left-color:var(--race);transform:skewX(10deg) translateX(10px)}
+.g-item[aria-current="true"] .pr{color:var(--ink)}
+.g-item.sold .nm{text-decoration:line-through;text-decoration-color:var(--race)}
+.g-item:focus-visible{outline:none}.g-item:focus-visible .in{outline:3px solid var(--paper);outline-offset:2px}
+.g-stats{position:absolute;right:24px;top:130px;width:min(360px,34vw);max-height:calc(100% - 220px);overflow:auto;background-color:var(--paper);color:var(--ink);padding:22px 22px 18px;
+  box-shadow:6px 7px 0 rgba(0,0,0,.5),0 24px 50px rgba(0,0,0,.6);rotate:.8deg}
+.g-stats:empty{display:none}
+.g-stats.swap{animation:gswap .4s cubic-bezier(.2,1.3,.4,1)}
+@keyframes gswap{from{transform:translateX(30px) rotate(3deg);opacity:.2}}
+.g-stats .tape{left:40%;width:90px}
+.g-eyebrow{font-family:var(--f-type);font-size:14px;color:#5b5560}
+.g-stats h3{font-family:var(--f-display);font-weight:400;font-size:30px;line-height:1.02;margin:4px 0 8px;text-wrap:balance}
+.g-price{font-family:var(--f-display);font-size:46px;line-height:1;color:var(--race);font-variant-numeric:tabular-nums}
+.g-price small{font-size:15px;color:var(--ink)}
+.g-status{display:inline-block;margin:10px 0 14px;font-family:var(--f-mono);font-size:12px;padding:4px 8px;color:var(--paper)}
+.g-status.free{background:var(--ok)} .g-status.sold{background:var(--ink)} .g-status.low{background:var(--race);margin-left:6px}
+.g-statlist{display:grid;gap:9px;margin-bottom:14px}
+.stat{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;align-items:center;font-size:13px}
+.stat span{grid-column:1/-1;font-weight:600}
+.segs{display:grid;grid-template-columns:repeat(10,1fr);gap:3px;transform:skewX(-14deg)}
+.segs i{height:12px;background:#cfc7b4;transition:background .2s}
+.segs i.on{background:var(--race)}
+.segs i.on:nth-child(n+8){background:#a3131a}
+.segs i:nth-child(1){transition-delay:0ms}.segs i:nth-child(2){transition-delay:40ms}.segs i:nth-child(3){transition-delay:80ms}.segs i:nth-child(4){transition-delay:120ms}.segs i:nth-child(5){transition-delay:160ms}
+.segs i:nth-child(6){transition-delay:200ms}.segs i:nth-child(7){transition-delay:240ms}.segs i:nth-child(8){transition-delay:280ms}.segs i:nth-child(9){transition-delay:320ms}.segs i:nth-child(10){transition-delay:360ms}
+.stat b{font-family:var(--f-display);font-weight:400;font-size:18px;font-variant-numeric:tabular-nums;min-width:1.4em;text-align:right}
+.g-spec{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px;margin:0 0 14px}
+.g-spec dt{color:#5b5560} .g-spec dd{margin:0}
+/* the buy row stays pinned to the bottom of the card, so it never scrolls out of reach */
+.g-actions{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;position:sticky;bottom:-18px;z-index:1;margin:0 -22px;padding:10px 22px 12px;background-color:var(--paper);box-shadow:0 -10px 12px -8px rgba(0,0,0,.25)}
+.g-actions .btn{text-align:center}
+.g-arrow{width:42px;height:46px;border:2px solid var(--ink);background:transparent;color:var(--ink);font-size:14px;cursor:pointer}
+.g-arrow:hover{background:var(--ink);color:var(--paper)}
+.g-fine{font-size:11.5px;color:#6b6470;margin:10px 0 0}
+.g-keys{position:absolute;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));translate:-50% 0;display:flex;gap:22px;font-family:var(--f-mono);font-size:12px;color:var(--paper-2);white-space:nowrap}
+.g-keys>span{display:flex;gap:6px;align-items:center}
+@media (max-width:860px){
+  .g-top{padding-inline:16px;align-items:center} #taller .g-top h2{display:none} .g-meta{min-width:0;font-size:11px} .g-meta b{font-size:20px} .g-back .key{display:none}
+  .g-keys{display:none}
+  .g-menu{left:0;right:0;top:auto;bottom:0;width:auto;height:auto;display:flex;gap:6px;overflow-x:auto;overflow-y:hidden;padding:10px 12px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(8,7,10,.92)}
+  .g-zone{display:contents} .g-zlabel{display:none}
+  .g-item{flex:0 0 auto;width:auto;margin:0}
+  .g-item .in{grid-template-columns:12px auto}
+  .g-item .pr{display:none}
+  .g-item[aria-current="true"] .in{transform:skewX(10deg)}
+  .g-stats{left:12px;right:12px;width:auto;top:auto;bottom:calc(64px + env(safe-area-inset-bottom,0px));max-height:44%;rotate:0deg;padding:14px 16px}
+  /* the buy row stays pinned to the bottom of the card, so it never hides behind the parts strip */
+  .g-actions{bottom:-14px;margin:0 -16px -14px;padding:8px 16px 14px}
+  .g-stats h3{font-size:22px;margin:2px 0 4px} .g-price{font-size:32px} .g-fine,.g-spec,.g-stats .tape{display:none}
+  .g-status{margin:6px 0 10px} .g-statlist{gap:5px;margin-bottom:10px} .segs i{height:9px} .stat{font-size:12px}
+  .g-shade{background:linear-gradient(180deg,rgba(8,7,10,.8) 0,transparent 16%,transparent 40%,rgba(8,7,10,.85) 70%)}
+}
+.g-loading{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-type);color:var(--muted)}
+.g-names{font-size:13px;line-height:1.45;margin:0 0 12px}
+.g-names b{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:400;color:#5b5560}
+.g-item.names .in{border-left-color:var(--tape)}
+@media (max-width:860px){.g-names{font-size:12px;margin-bottom:8px}}

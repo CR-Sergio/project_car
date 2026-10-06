@@ -1,0 +1,119 @@
+/* Shared look: tokens, the tagged cinder-block wall, cut-paper headlines, buttons, stickers, tape, the garage door. */
+:root{
+  --asphalt:#18171b; --asphalt-2:#232127; --paper:#ece6d6; --paper-2:#d9d0bb; --news:#e6e1d3;
+  --ink:#141214; --race:#e2252e; --tape:#f1c232; --kraft:#c4a273; --blue:#2f6fe0; --muted:#9a94a0; --ok:#3fb36b;
+  --f-display:'Bowlby One','Arial Black',Impact,sans-serif;
+  --f-body:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --f-type:'Special Elite','Courier New',monospace;
+  --f-news:'Tinos','Times New Roman',Times,serif;
+  --f-black:'UnifrakturMaguntia','Old English Text MT',Georgia,serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:auto;overflow-x:clip}
+html,body{background:var(--asphalt);color:var(--paper)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.55;background-color:#26252a;position:relative;
+  background-image:linear-gradient(rgba(12,11,14,.68),rgba(12,11,14,.68)),url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='480' height='240'><filter id='c'><feTurbulence type='fractalNoise' baseFrequency='.045' numOctaves='5' stitchTiles='stitch'/><feDiffuseLighting lighting-color='%23a8a4ab' surfaceScale='2.2'><feDistantLight azimuth='225' elevation='52'/></feDiffuseLighting></filter><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .09 0'/></filter><rect width='480' height='240' fill='%232c2b30'/><rect width='480' height='240' filter='url(%23c)' opacity='.32'/><rect width='480' height='240' filter='url(%23g)'/><defs><linearGradient id='ao' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='%23000' stop-opacity='.35'/><stop offset='.25' stop-color='%23000' stop-opacity='0'/><stop offset='.8' stop-color='%23000' stop-opacity='0'/><stop offset='1' stop-color='%23000' stop-opacity='.45'/></linearGradient></defs><rect width='480' height='120' fill='url(%23ao)'/><rect y='120' width='480' height='120' fill='url(%23ao)'/><g fill='none' stroke='%230b0a0d' stroke-width='6' opacity='.9'><path d='M0 1.5H480M0 121.5H480M1.5 0V120M241.5 0V120M121.5 120V240M361.5 120V240'/></g><g fill='none' stroke='%23ffffff' stroke-width='1' opacity='.06'><path d='M0 5H480M0 125H480'/></g></svg>");
+  overflow-x:clip}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--tape);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* paper texture: any element with .paper multiplies the crumpled scan over its own color */
+.rl.paper{background-image:url(/img/paper.webp);background-blend-mode:multiply}
+/* torn crumpled-paper frame behind every cut-paper headline */
+.pframe{position:relative;isolation:isolate;padding:.3em .45em .34em;filter:drop-shadow(4px 6px 0 rgba(0,0,0,.55))}
+.ransom.pframe{display:inline-flex;max-width:100%}
+.pframe::before{content:"";position:absolute;inset:0;z-index:-1;background:#efebe2 url(/img/paper.webp) center/760px auto;background-blend-mode:multiply;clip-path:var(--tear,none)}
+.hero h1.pframe{rotate:-1.2deg}
+.ransom[data-style="bold"] .rl{filter:drop-shadow(3px 4px 0 rgba(0,0,0,.7)) drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+.ransom[data-style="bold"] .rl.img img{filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45))}
+.logo .pframe{padding:.22em .32em;filter:drop-shadow(2px 3px 0 rgba(0,0,0,.55))}
+/* graffiti layer */
+#graffiti{position:absolute;left:0;top:0;width:100%;height:0;overflow:hidden;pointer-events:none;z-index:0}
+#graffiti .tag{position:absolute;white-space:nowrap;line-height:1;text-shadow:0 0 2px currentColor,0 0 16px currentColor}
+#graffiti .sedg{font-family:'Sedgwick Ave Display','Permanent Marker',cursive}
+#graffiti .wet{font-family:'Rubik Wet Paint','Bowlby One',sans-serif}
+#graffiti .marker{font-family:'Permanent Marker',cursive}
+#graffiti .stencil{font-family:'Rubik Mono One',monospace;letter-spacing:.12em;text-shadow:0 0 6px currentColor}
+#graffiti .throw{-webkit-text-stroke:3px #0d0c0f;paint-order:stroke fill}
+main,footer,.ticker{position:relative;z-index:1}
+/* deep shadows: fixed vignette + a single overhead light over the wall */
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 70% 55% at 50% 18%,rgba(255,236,200,.05),transparent 60%),radial-gradient(ellipse 120% 90% at 50% 40%,transparent 45%,rgba(0,0,0,.72) 100%)}
+#graffiti .buff{position:absolute;background:#2f2e33;opacity:.55;box-shadow:inset 0 0 40px rgba(0,0,0,.35)}
+#graffiti .tag{text-shadow:0 0 3px currentColor,0 0 22px rgba(0,0,0,.6);filter:blur(.3px)}
+/* street layer: wheat-pasted posters, sticker slaps, a stencil, paint drips and overspray (all placed by <Graffiti/>) */
+#graffiti .mist{position:absolute;border-radius:50%;background:radial-gradient(closest-side,currentColor,transparent);opacity:.1}
+#graffiti .drip{position:absolute;top:82%;width:.05em;min-width:3px;background:currentColor;border-radius:0 0 3px 3px}
+#graffiti .drip::after{content:"";position:absolute;left:50%;bottom:-.06em;width:.1em;min-width:6px;aspect-ratio:1;translate:-50% 0;border-radius:50%;background:currentColor}
+#graffiti .poster{position:absolute;display:grid;place-content:center;text-align:center;line-height:.92;padding:.5em .6em;color:var(--ink);
+  background-color:#e6dfcc;background-image:linear-gradient(170deg,transparent 55%,rgba(60,45,20,.28)),url(/img/paper.webp);background-size:auto,420px auto;background-blend-mode:normal,multiply;
+  clip-path:var(--torn);box-shadow:inset 0 0 30px rgba(70,55,30,.35);filter:saturate(.75) brightness(.82)}
+#graffiti .poster b{display:block;font-family:'Bowlby One',Impact,sans-serif;font-weight:400;letter-spacing:.01em}
+#graffiti .poster i{display:block;font-family:'Special Elite',monospace;font-style:normal;font-size:.32em;margin-top:.5em;letter-spacing:.04em}
+#graffiti .poster::after{content:"";position:absolute;right:0;top:0;width:22%;aspect-ratio:1;background:linear-gradient(225deg,#2c2b30 49%,#d8d0bb 51%,#a99f88);box-shadow:-3px 3px 6px rgba(0,0,0,.4)}
+#graffiti .poster.flat::after{display:none}
+#graffiti .slap{position:absolute;font-family:'JetBrains Mono',monospace;font-weight:700;line-height:1;box-shadow:1px 2px 0 rgba(0,0,0,.45);filter:saturate(.85) brightness(.88)}
+#graffiti .slap.hello{background:#d9252e;color:#fff;border-radius:6px;padding:4px 4px 6px;width:9em;text-align:center;font-size:9px;letter-spacing:.08em}
+#graffiti .slap.hello span{display:block;background:#f4f0e6;color:#1d4fb8;font-family:'Permanent Marker',cursive;font-weight:400;font-size:2.3em;letter-spacing:0;padding:6px 0 4px;margin-top:4px;border-radius:2px}
+#graffiti .slap.dot{width:4.2em;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;font-family:'Bowlby One',sans-serif;font-weight:400;font-size:14px;border:3px solid currentColor}
+#graffiti .slap.tagbox{padding:5px 8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:2px solid #141214}
+#graffiti .slap.check{width:7em;height:1.6em;font-size:12px;background:conic-gradient(#141214 25%,#ece6d6 0 50%,#141214 0 75%,#ece6d6 0) 0 0/12px 12px}
+#graffiti .stencil-car{position:absolute;aspect-ratio:5/2;background:currentColor;filter:drop-shadow(0 0 7px currentColor);
+  -webkit-mask:var(--car) center/contain no-repeat;mask:var(--car) center/contain no-repeat}
+#graffiti .stencil-txt{position:absolute;font-family:'Rubik Mono One',monospace;letter-spacing:.2em;white-space:nowrap}
+
+/* ---------- ransom letters ---------- */
+.ransom{display:flex;flex-wrap:wrap;align-items:center;gap:.06em .02em;line-height:1;margin:0;font-weight:400}
+.ransom .word{display:inline-flex;align-items:center;gap:.02em;margin-right:.32em;white-space:nowrap}
+.ransom .word:last-child{margin-right:0}
+.rl{display:inline-grid;place-items:center;height:1.12em;min-width:.7em;padding:0 .1em;font-size:1em;
+  filter:drop-shadow(2px 3px 0 rgba(0,0,0,.45));background-size:300px auto}
+.rl.img{padding:0;background:none!important;min-width:0}
+.rl.img img{height:1.18em;width:auto;display:block}
+.slap .rl{animation:slap .5s cubic-bezier(.2,1.6,.4,1) both;animation-delay:calc(var(--i) * 45ms + 150ms)}
+@keyframes slap{from{scale:1.9;rotate:-18deg;filter:drop-shadow(14px 18px 0 rgba(0,0,0,.25))}}
+.ransom .rl:hover{scale:1.12;transition:scale .15s}
+
+/* ---------- shared bits ---------- */
+.sticker{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;background-color:var(--paper);color:var(--ink);
+  border-radius:3px;transform:rotate(-1.5deg);box-shadow:2px 2px 0 rgba(0,0,0,.5);transition:transform .2s}
+.sticker:nth-child(2){background-color:var(--race);color:var(--paper);transform:rotate(1.2deg)}
+.sticker:nth-child(3){background-color:var(--tape);transform:rotate(-.6deg)}
+.sticker:hover{transform:rotate(0) scale(1.06)}
+.btn{font-family:var(--f-display);font-size:18px;letter-spacing:.02em;border:0;cursor:pointer;text-decoration:none;display:inline-block;
+  padding:14px 22px;background-color:var(--race);color:var(--paper);
+  clip-path:polygon(0 4%,3% 0,97% 6%,100% 0,99% 52%,100% 96%,96% 100%,52% 95%,3% 100%,0 92%,2% 50%);transition:transform .15s}
+.btn:hover{transform:translateY(-2px) rotate(-.6deg)}
+.btn:active{transform:translateY(1px) scale(.98)}
+.btn.ghost{background-color:var(--paper);color:var(--ink)}
+.btn[disabled]{background-color:#4a464e;color:var(--muted);cursor:not-allowed;transform:none}
+.tape{position:absolute;width:110px;height:30px;background:rgba(241,194,50,.78);top:-14px;left:50%;transform:translateX(-50%) rotate(-4deg);
+  clip-path:polygon(3% 0,97% 8%,100% 30%,96% 55%,100% 80%,97% 100%,2% 94%,0 70%,4% 45%,0 20%);z-index:3}
+
+/* ---------- garage door transition ---------- */
+#door{position:fixed;inset:0;z-index:100;transform:translateY(-104%);pointer-events:none;will-change:transform}
+#door.active{pointer-events:auto}
+#door .slats{position:absolute;inset:0 0 38px 0;background-color:#9e9aa2;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='.02 .6' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .25  0 0 0 0 .22  0 0 0 0 .2  0 0 0 .22 0'/></filter><rect width='260' height='260' filter='url(%23g)'/></svg>"),repeating-linear-gradient(180deg,#d7d3d8 0,#b4b0b7 6px,#9a96a0 30px,#77737d 48px,#3a373e 54px,#2a282d 58px);
+  background-size:260px 260px,100% 58px;box-shadow:inset 0 -8px 20px #0007}
+#door .slats::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0005,transparent 12%,transparent 88%,#0005)}
+#door .seal{position:absolute;left:0;right:0;bottom:0;height:38px;background:linear-gradient(#4a464f,#1d1b20);border-top:3px solid #2a282d}
+#door .handle{position:absolute;left:50%;bottom:10px;translate:-50% 0;width:120px;height:14px;border-radius:7px;background:linear-gradient(#cfcbd2,#7d7983);box-shadow:0 2px 0 #000}
+#door .spray{position:absolute;left:50%;top:40%;translate:-50% -50%;font-family:'Rubik Mono One',var(--f-display);font-size:clamp(30px,8vw,96px);color:#16141a;opacity:.82;
+  letter-spacing:.06em;white-space:nowrap;text-shadow:0 0 6px #16141a88,0 0 18px #16141a44;rotate:-3deg}
+#door .sign{position:absolute;left:50%;top:60%;translate:-50% 0;rotate:2deg;background-color:var(--paper);color:var(--ink);padding:14px 22px 16px;text-align:center;box-shadow:5px 6px 0 #0006;min-width:220px}
+#door .sign small{display:block;font-family:var(--f-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6b6470}
+#door .sign strong{font-family:var(--f-display);font-weight:400;font-size:26px;line-height:1.1}
+#door .sign .tape{top:-16px}
+main.shake,header.top.shake{animation:shake .28s}
+@keyframes shake{25%{translate:0 3px}50%{translate:0 -2px}75%{translate:0 1px}}
+
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:96;background:var(--tape);color:var(--ink);font-family:var(--f-mono);font-size:13px;padding:10px 14px;box-shadow:3px 3px 0 rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+#taller{position:fixed;inset:0;z-index:90;background:#0b0a0d}
