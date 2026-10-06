@@ -96,4 +96,5 @@ Todo lo que hay que tener en regla fuera del código (impuestos, evidencia de ca
 Es un sitio estático: `npm run build` y se sube la carpeta `dist/`.
 
 - **Vercel**: funciona tal cual, `vercel.json` ya manda las rutas como `/garage` a la app.
-- **Netlify / Cloudflare Pages**: build `npm run build`, carpeta `dist`. `public/_redirects` ya está incluido.
+- **Netlify**: configurado mediante `netlify.toml` para SPA routing.
+- **Cloudflare Pages / Workers**: funciona automáticamente con SPA fallback a `/index.html` (no requiere `_redirects`).
