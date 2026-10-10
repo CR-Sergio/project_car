@@ -26,7 +26,7 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
   const [brand, setBrand] = useState(''), [color, setColor] = useState('#2f6fe0'), [email, setEmail] = useState(''), [link, setLink] = useState('');
   const [logo, setLogo] = useState<HTMLImageElement | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [method, setMethod] = useState<'mp' | 'stripe'>(usd ? 'stripe' : 'mp');
+  const [method, setMethod] = useState<'mp' | 'stripe'>('stripe');
   const [err, setErr] = useState(''), [processing, setProcessing] = useState(false);
   const [accepted, setAccepted] = useState(false), [finalSale, setFinalSale] = useState(false), [noNews, setNoNews] = useState(false);
   const total = priceOf(p);

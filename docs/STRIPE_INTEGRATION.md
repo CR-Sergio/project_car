@@ -117,6 +117,9 @@ Configurar en **Cloudflare Pages** (`Settings` > `Environment variables`):
    - Tests unitarios ampliados en `src/data/checkout.test.ts` cubriendo cálculos de divisas, reglas de negocio y claves de idempotencia.
    - Pipeline de integración continua configurado en `.github/workflows/ci.yml` ejecutado en contenedores Docker como Quality Gate (sin interferir con el despliegue nativo de Cloudflare Pages).
 
+5. **Experiencia de Usuario (Checkout UI):**
+   - Se configuró **Stripe como método de pago predeterminado** en `CheckoutModal.tsx`, asegurando que al abrir la compra de cualquier pieza o mensaje, el usuario vea de inmediato las ventajas fiscales (factura oficial en PDF, desglose de IVA y casilla para RFC) sin requerir selección manual.
+
 ---
 
 ## 6. Interacción entre CI/CD y Cloudflare Pages & Workers
@@ -127,3 +130,25 @@ Para evitar conflictos o dobles despliegues:
    - El frontend estático desde `dist/`.
    - Las serverless functions de la carpeta `/functions/` vinculándolas con la base de datos D1 (`DB`) y el bucket R2 (`BUCKET`).
 3. **Cero interferencia:** El flujo de GitHub Actions no sobreescribe ni compite con el despliegue de Cloudflare Pages a menos que se configure explícitamente el modo Direct Upload por CLI.
+
+---
+
+## 7. Diagnóstico y Preguntas Frecuentes: "¿Por qué no veo la pasarela de Stripe?"
+
+Si el proyecto ya está desplegado en Cloudflare Pages pero no observas la pasarela de Stripe:
+
+1. **Ruta de acceso en la interfaz:**
+   - No existe un botón en la barra superior llamado "Stripe". Para abrir la pasarela:
+     - Ingresa a la sección **El Garage** (`/garage` o haciendo clic en cualquier pieza del auto en 3D).
+     - Elige una pieza o salpicadera y haz clic en **"Comprar esta pieza"** o **"Dejar mensaje"**.
+     - Se abrirá el modal de pago con Stripe preseleccionado.
+2. **Modo de Operación (`VITE_PAY_MODE`):**
+   - Si no has definido `VITE_PAY_MODE = live` en las variables de entorno de Cloudflare Pages, la aplicación compila en modo `'test'`.
+   - En modo prueba, al dar clic en "Pagar" se simula la compra en local con confeti y no se redirige a `https://checkout.stripe.com`.
+3. **Variables requeridas en Cloudflare Pages:**
+   - En Cloudflare Pages (*Settings > Environment variables*):
+     - `VITE_PAY_MODE` = `live`
+     - `STRIPE_SECRET_KEY` = `sk_live_...` (o `sk_test_...`)
+     - `STRIPE_WEBHOOK_SECRET` = `whsec_...`
+   - En Cloudflare Pages (*Settings > Functions > D1 database bindings*):
+     - Variable `DB` vinculada a `proyect_car_db`.
