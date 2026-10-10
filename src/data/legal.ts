@@ -4,13 +4,13 @@
    (src/pages/legal/) antes de lanzar: son una base, no asesoría legal. */
 export const LEGAL = {
   /** nombre completo de la persona responsable del proyecto */
-  responsable: '[TU NOMBRE COMPLETO]',
-  /** domicilio para recibir notificaciones (puede ser una oficina o un domicilio convencional, no tiene que ser tu casa) */
-  domicilio: '[CALLE Y NÚMERO, COLONIA, C.P., MONTERREY, NUEVO LEÓN]',
-  email: '[contacto@proyectcar.com]',
+  responsable: 'Sergio Mondragon',
+  /** domicilio para recibir notificaciones (general por el momento) */
+  domicilio: 'Monterrey, Nuevo León',
+  email: 'contacto@proyectcar.com',
   sitio: 'proyectcar.com',
   /** fecha de la última actualización de los textos legales */
-  actualizado: '5 de octubre de 2026',
+  actualizado: '9 de octubre de 2026',
 
   /* condiciones del servicio (también salen en las Dudas y en el checkout) */
   /** meses que se queda el vinil desde que se instala */

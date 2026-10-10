@@ -27,29 +27,47 @@ Cotiza con 2 o 3 talleres para confirmarlo.
 
 ## 2. Textos legales en la página
 
-- [ ] Llenar tus datos en `src/data/legal.ts` (nombre, RFC, domicilio, correo). Mientras falten, las páginas los marcan en amarillo.
+- [x] Llenar tus datos en `src/data/legal.ts` (Sergio Mondragon, contacto@proyectcar.com, Monterrey, N.L., proyectcar.com). Completado: sin advertencias de pendientes en `/terminos` y `/aviso-de-privacidad`.
 - [ ] Revisar las condiciones del servicio en el mismo archivo: vigencia (6 meses), videos mínimos (3) y plazos para logo, diseño, aprobación e instalación. **No subas `diasDiseno` de 10 días hábiles**: es lo que sostiene la política de ventas finales frente al derecho de revocación de 5 días (art. 56 LFPC, que no aplica a servicios que se prestan dentro de 10 días hábiles).
 - [ ] Domicilio: puede ser una oficina o un domicilio para notificaciones; no tiene que ser tu casa.
 - [ ] Pasarle `/terminos` y `/aviso-de-privacidad` a un abogado. Están escritos con base en la Ley Federal de Protección de Datos Personales en Posesión de los Particulares (DOF 20/03/2025) y la Ley Federal de Protección al Consumidor.
 - [ ] Tener un correo real de contacto que revises: por ahí llegan logos, aclaraciones, contracargos y derechos ARCO (plazo de respuesta: 20 días hábiles).
 - [ ] Guardar por cada venta la evidencia: fecha y hora de aceptación de términos y de la política de ventas finales, correos con el logo y la aprobación del diseño, y fotos de la instalación. Es lo que te defiende en un contracargo.
 
-## 3. Pagos
+## 3. Pagos y Base de Datos (Cloudflare D1 + Stripe Checkout)
 
-- [ ] Abrir cuenta de Mercado Pago y/o Stripe a tu nombre y RFC.
-- [ ] Crear un Payment Link por pieza por su precio y pegarlos en `src/data/parts.ts`; cambiar `PAY_MODE` a `'live'` en `src/data/config.ts`.
-- [ ] En la descripción de cada link (o en el recibo de la pasarela), poner "Servicio de publicidad · venta final, sin reembolsos · ver términos en proyectcar.com/terminos".
-- [ ] Leer los términos de uso de cada pasarela: lo que vendes es un servicio de publicidad, no donaciones.
-- [ ] Antes de lanzar, borrar las ventas de ejemplo (`EXAMPLE_SOLD` en `src/data/parts.ts`) y cambiar el pie de página de "página de prueba".
-- [ ] Siguiente paso técnico: backend con webhook para marcar piezas vendidas, apartar la pieza mientras alguien paga y guardar los datos del checkout (hoy se pierden al recargar).
+El backend serverless ya está implementado en `functions/api/` y el esquema SQL en `d1/schema.sql`.
 
-## 4. Mensajes de la raza (salpicaderas a $100) y nombres en el techo
+Pasos para activar en producción:
+- [ ] **Crear la base de datos en Cloudflare D1**:
+  - En Cloudflare Dashboard > *Workers & Pages* > *D1* > *Create Database* con el nombre `proyect_car_db` (o ejecuta: `npx wrangler d1 create proyect_car_db`).
+  - En tu proyecto de Cloudflare Pages > *Settings* > *Functions* > *D1 database bindings*, vincula la variable `DB` apuntando a `proyect_car_db`.
+  - Ejecuta el esquema en la base de datos: copia y pega el contenido de `d1/schema.sql` en la consola SQL de D1 en Cloudflare (o ejecuta: `npx wrangler d1 execute proyect_car_db --file=./d1/schema.sql`).
+- [ ] **Configurar Stripe**:
+  - Crear cuenta en Stripe (a tu nombre y RFC).
+  - En Stripe Dashboard > *Developers* > *API keys*, copia la Secret Key (`sk_live_...` o `sk_test_...` para pruebas).
+  - En Cloudflare Pages > *Settings* > *Environment variables*, agrega:
+    - `STRIPE_SECRET_KEY`: Tu clave secreta de Stripe.
+    - `VITE_PAY_MODE`: `live` (o `test` para pruebas).
+- [ ] **Configurar el Webhook de Stripe**:
+  - En Stripe Dashboard > *Developers* > *Webhooks* > *Add endpoint*.
+  - Endpoint URL: `https://tudominio.com/api/webhook`
+  - Eventos a escuchar: `checkout.session.completed` y `checkout.session.expired`.
+  - Copia el *Signing secret* (`whsec_...`) y agrégalo en las variables de Cloudflare Pages como `STRIPE_WEBHOOK_SECRET`.
+- [ ] **Crear el bucket de almacenamiento Cloudflare R2 (para logos PNG)**:
+  - En Cloudflare Dashboard > *R2* > *Create Bucket* con el nombre `proyect-car-assets` (o ejecuta: `npx wrangler r2 bucket create proyect-car-assets`).
+  - En Cloudflare Pages > *Settings* > *Functions* > *R2 bucket bindings*, vincula la variable `BUCKET` apuntando a `proyect-car-assets`.
+  - Con esto, los logos subidos en el checkout se guardan automáticamente en R2, se sirven con caché en `/api/logo/logos/...` y se pintan en el auto 3D, teniendo además el archivo original de hasta 10 MB para la impresión en vinil.
+- [ ] **Verificar recibos automáticos**:
+  - En Stripe Dashboard > *Settings* > *Customer emails*, activa el envío automático de recibos por compra exitosa.
 
-- [ ] Antes de cobrar en real, los mensajes **necesitan el backend**: con un Payment Link fijo, el mensaje y el nombre que escribe la persona no te llegan. Opción rápida: un formulario (Tally / Google Forms) que pida mensaje, nombre para el techo y folio del pago; o el webhook de la pasarela.
+## 4. Mensajes de la raza y nombres en el techo
+
+Con el backend en Cloudflare Pages Functions y D1, los mensajes y nombres de cortesía se guardan automáticamente en la tabla `messages` cuando Stripe confirma el pago:
 - [ ] Revisar cada mensaje y nombre antes de imprimir (sin marcas, anuncios, links, groserías, política ni datos personales) y guardar el correo de confirmación.
 - [ ] Imprimir por tandas, al menos una vez al mes mientras haya pendientes (cláusula 13). La página dice "hasta agotar existencias" y no muestra el límite; el límite real es `MESSAGES_PER_PART` (120 por lado, 240 en total, letras de ≈1.3 cm), que es lo que cuadra la meta. Confírmalo con el rotulador en la primera tanda.
 - [ ] Ojo con la comisión: en $100 la pasarela se lleva ≈$7 (≈7%).
-- [ ] Borrar `EXAMPLE_MESSAGES` en `src/data/parts.ts` antes de lanzar.
+- [x] Borrar `EXAMPLE_MESSAGES` y `EXAMPLE_SOLD` antes del lanzamiento público definitivo (Completado: base limpia para producción en `src/data/parts.ts`).
 
 ## 5. El carro en la calle
 
