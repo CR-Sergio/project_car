@@ -9,9 +9,9 @@ describe('parts catalog', () => {
     expect(new Set(PARTS.map(p => p.id)).size).toBe(15);
     expect(ORDER).toHaveLength(15);
   });
-  it('has a logo aspect ratio for every part and valid example sales', () => {
+  it('has a logo aspect ratio for every part and starts with clean production sales', () => {
     for (const p of PARTS) expect(PALIO_ASPECT[p.id]).toBeGreaterThan(0);
-    for (const id of Object.keys(EXAMPLE_SOLD)) expect(PART_BY_ID[id]).toBeDefined();
+    expect(Object.keys(EXAMPLE_SOLD)).toHaveLength(0);
   });
   it('has every text in English too', () => {
     expect(Object.keys(es).filter(k => en[k as keyof typeof es] == null)).toEqual([]);
@@ -25,13 +25,15 @@ describe('parts catalog', () => {
     // selling every brand part and every message reaches the goal
     expect(BRAND_PARTS.reduce((a, p) => a + p.price, 0) + MESSAGES_CAPACITY * 100).toBeGreaterThanOrEqual(GOAL_MXN);
     expect(PART_BY_ID[NAMES_PART_ID]).toMatchObject({ kind: 'names', price: 0 });
-    for (const id of Object.keys(EXAMPLE_SOLD)) expect(PART_BY_ID[id].kind).toBeUndefined();
   });
-  it('validates 24-character messages', () => {
+  it('validates 24-character messages and starts with clean production messages', () => {
     expect(MESSAGE_MAX).toBe(24);
-    for (const ok of ['¡Arre con el project!', 'Te queremos, Palio', 'Vamos por el 2.0', '¿Y el 13? #MTY']) expect(MESSAGE_RE.test(ok)).toBe(true);
+    for (const ok of ['¡Arre con el project!', 'Te queremos, Palio', 'Vamos por el 2.0', '¿Y el 13? #MTY']) {
+      expect(ok.length).toBeLessThanOrEqual(MESSAGE_MAX);
+      expect(MESSAGE_RE.test(ok)).toBe(true);
+    }
     for (const bad of ['<b>hola</b>', 'arre 🚗', 'a/b=c']) expect(MESSAGE_RE.test(bad)).toBe(false);
-    for (const m of EXAMPLE_MESSAGES) { expect(m.text.length).toBeLessThanOrEqual(MESSAGE_MAX); expect(MESSAGE_RE.test(m.text)).toBe(true); }
+    expect(EXAMPLE_MESSAGES).toHaveLength(0);
   });
   it('puts each message’s gift name on the roof and fills both fenders evenly', () => {
     expect(roofNames([{ text: 'a', part: 'salpi-i', name: 'Lupe' }, { text: 'b', part: 'salpi-d' }])).toEqual(['Lupe']);

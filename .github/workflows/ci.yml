@@ -1,0 +1,56 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Typecheck, Test & Build (Docker Container)
+    runs-on: ubuntu-latest
+    container:
+      image: node:20-alpine
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies in Container
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit Tests
+        run: npm run test
+
+      - name: Build Assets (Vite)
+        run: npm run build
+
+  # ============================================================================
+  # DESPLIEGUE A CLOUDFLARE PAGES (OPCIONAL / HEADLESS)
+  #
+  # NOTA DE COMPATIBILIDAD CON CLOUDFLARE PAGES:
+  # Si tu repositorio ya está vinculado directamente en el panel de Cloudflare
+  # (Cloudflare Pages > Connect to Git), Cloudflare realiza el despliegue de forma
+  # nativa y compila automáticamente las Pages Functions de `/functions` con D1 y R2.
+  #
+  # En ese caso, este paso NO es necesario (evita doble despliegue).
+  # Si prefieres despliegue directo por CLI/API, configura los secrets en GitHub.
+  # ============================================================================
+  deploy:
+    name: Deploy to Cloudflare Pages (Direct Upload)
+    needs: validate
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && false # Desactivado por defecto para no interferir con la integración nativa de Cloudflare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=proyect-car

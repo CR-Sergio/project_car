@@ -88,13 +88,8 @@ export interface Message {
   news?: boolean;
   acceptedAt?: string;
 }
-/* Mensajes de EJEMPLO para ver cómo se ven las salpicaderas y el techo. Bórralos al lanzar. */
-export const EXAMPLE_MESSAGES: Message[] = ([
-  ['¡Arre con el project!', 'Doña Lupe'], ['Pura vida regia', 'El Primo'], ['Que ruede el 13', '@mau.mty'],
-  ['Te queremos, Palio', 'Fer y Caro'], ['De MTY pa’l mundo', 'Tío Beto'], ['Sin frenos ni miedo', 'La Güera'],
-  ['Aquí andamos, compa', 'Chuy 81'], ['Full gas siempre', 'Los del 13'], ['Echale ganas', 'Rafa G.'],
-  ['Para mi papá, que soñó', 'Mamá'], ['Vamos por el 2.0', 'Pollo'], ['Aguanta, carnal', 'Toño Garza'],
-] as const).map(([text, name], i) => ({ text, name, part: i % 2 ? 'salpi-d' : 'salpi-i' }));
+/* Mensajes de ejemplo retirados para producción (se sincronizan desde Cloudflare D1 vía /api/sales) */
+export const EXAMPLE_MESSAGES: Message[] = [];
 
 /** mensajes: letras, números, espacios y puntuación común (el vinil no imprime emojis) */
 export const MESSAGE_RE = /^[\p{L}\p{N} .,;:!¡?¿'’"&@#_()-]+$/u;
@@ -122,11 +117,8 @@ export interface Sale {
 }
 export type SoldMap = Record<string, Sale>;
 
-/* Ventas de EJEMPLO para ver cómo se ve una pieza vendida. Bórralas al lanzar. */
-export const EXAMPLE_SOLD: SoldMap = {
-  'puerta-dd': {brand:'Llantera Demo', color:'#2f6fe0'},
-  'defensa-d': {brand:'Taller Demo',   color:'#e2252e'},
-};
+/* Ventas de ejemplo retiradas para producción (se sincronizan desde Cloudflare D1 vía /api/sales) */
+export const EXAMPLE_SOLD: SoldMap = {};
 
 /* proporción ancho/alto de cada pieza en el modelo 3D (para acomodar el logo).
    Las puertas traseras (puerta + costado) y las ventanas traseras se recalculan al cargar el modelo (src/three/model.ts). */

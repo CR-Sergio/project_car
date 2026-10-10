@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { PAY_MODE } from '../../data/config';
+import { API_BASE, PAY_MODE } from '../../data/config';
 import { MESSAGES_PER_PART, MESSAGE_MAX, MESSAGE_RE, NAME_MAX, NAME_RE, PART_BY_ID, cleanName } from '../../data/parts';
 import { brandCanvas } from '../../lib/brandCanvas';
 import { namesCanvas } from '../../lib/namesCanvas';
@@ -16,13 +16,16 @@ type Step = { kind: 'form' } | { kind: 'redirect'; url: string; via: string } | 
     for the roof, email). In test mode the payment is simulated. */
 export function CheckoutModal({ partId, onClose }: { partId: string; onClose: () => void }) {
   const { t, cur, nameOf, money, priceOf } = useLocale();
-  const { markSold, addMessage, wall } = useSales();
+  const { markSold, addMessage, wall, reserved } = useSales();
   const toast = useToast();
   const p = PART_BY_ID[partId], usd = cur === 'USD', isMsg = p.kind === 'messages';
+  const isReserved = !isMsg && Boolean(reserved[partId] && reserved[partId].expiresAt > Date.now());
+  const minutesLeft = isReserved ? Math.max(1, Math.ceil((reserved[partId].expiresAt - Date.now()) / 60000)) : 0;
   const [msg, setMsg] = useState(''), [roof, setRoof] = useState(true), [who, setWho] = useState(''), [consent, setConsent] = useState(false);
   const [step, setStep] = useState<Step>({ kind: 'form' });
   const [brand, setBrand] = useState(''), [color, setColor] = useState('#2f6fe0'), [email, setEmail] = useState(''), [link, setLink] = useState('');
   const [logo, setLogo] = useState<HTMLImageElement | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [method, setMethod] = useState<'mp' | 'stripe'>(usd ? 'stripe' : 'mp');
   const [err, setErr] = useState(''), [processing, setProcessing] = useState(false);
   const [accepted, setAccepted] = useState(false), [finalSale, setFinalSale] = useState(false), [noNews, setNoNews] = useState(false);
@@ -56,7 +59,9 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
   useEffect(() => { if (step.kind === 'done') ok.current?.focus(); }, [step]);
 
   function pickLogo(f: File | undefined) {
-    if (!f) return; const url = URL.createObjectURL(f), im = new Image();
+    if (!f) return;
+    setLogoFile(f);
+    const url = URL.createObjectURL(f), im = new Image();
     im.onload = () => { setLogo(im); URL.revokeObjectURL(url); }; im.src = url;
   }
 
@@ -73,6 +78,64 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
     if (isMsg && (wall.byPart[partId]?.length ?? 0) >= MESSAGES_PER_PART) return setErr(t('msgFull'));
     const via = method === 'mp' ? 'Mercado Pago' : 'Stripe';
     if (PAY_MODE === 'live') {
+      if (method === 'stripe') {
+        setProcessing(true);
+        setErr('');
+
+        const proceedWithCheckout = (uploadedLogoUrl?: string) => {
+          fetch(`${API_BASE}/api/create-checkout-session`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              partId,
+              brand: b,
+              color,
+              email: m,
+              link: link.trim(),
+              logoUrl: uploadedLogoUrl,
+              msg: b,
+              roofName: roof ? name : undefined,
+              news: !noNews,
+              cur,
+            }),
+          })
+            .then(async res => {
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.error || 'Error al iniciar checkout');
+              if (data.checkoutUrl) {
+                window.location.href = data.checkoutUrl;
+              } else {
+                throw new Error('No se recibió enlace de pago');
+              }
+            })
+            .catch(err => {
+              setProcessing(false);
+              setErr(err?.message || 'Error al conectar con la pasarela de pago');
+            });
+        };
+
+        if (logoFile) {
+          const fd = new FormData();
+          fd.append('file', logoFile);
+          fd.append('partId', partId);
+          fetch(`${API_BASE}/api/upload-logo`, { method: 'POST', body: fd })
+            .then(async r => {
+              if (!r.ok) {
+                const errData = await r.json().catch(() => ({}));
+                throw new Error(errData.error || 'Error al subir el archivo de logo');
+              }
+              return r.json();
+            })
+            .then(data => proceedWithCheckout(data.logoUrl))
+            .catch(err => {
+              setProcessing(false);
+              setErr(err?.message || 'Error al procesar la imagen');
+            });
+        } else {
+          proceedWithCheckout();
+        }
+        return;
+      }
       const url = usd && p.stripeUsd ? p.stripeUsd : p[method];
       if (!url) return setErr(t('errLink'));
       setStep({ kind: 'redirect', url, via }); return;
@@ -128,16 +191,26 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
               {!usd && <label><input type="radio" name="pm" value="mp" checked={method === 'mp'} onChange={() => setMethod('mp')} /> Mercado Pago</label>}
               <label><input type="radio" name="pm" value="stripe" checked={method === 'stripe'} onChange={() => setMethod('stripe')} /> Stripe</label>
             </div>
+            {method === 'stripe' && (
+              <p className="fine" style={{ marginTop: '4px', color: '#635bff', fontWeight: 500 }}>
+                ✓ Incluye factura oficial en PDF con desglose de impuestos y campo para RFC / Tax ID.
+              </p>
+            )}
             {usd && <p className="sub">{t('usdNote')}</p>}
             <label className="check"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t(isMsg ? 'acceptName' : 'accept') }} /></label>
             <label className="check"><input type="checkbox" checked={finalSale} onChange={e => setFinalSale(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t(isMsg ? 'noRefundName' : 'noRefund') }} /></label>
             {isMsg && roof && <label className="check"><input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} /> {t('nameConsent')}</label>}
             <label className="check"><input type="checkbox" checked={noNews} onChange={e => setNoNews(e.target.checked)} /> {t('noNews')}</label>
             <p className="fine">{t('privacyShort', { who: 'Proyect Car' })}{isMsg ? '' : ' ' + t('restrictedNote')}</p>
+            {isReserved && (
+              <p className="err" style={{ color: '#d97706', background: 'rgba(217, 119, 6, 0.1)', padding: '6px 10px', borderRadius: '4px' }}>
+                ⚠️ Esta pieza está apartada en proceso de pago por otra persona. Si no completa su compra, quedará libre en ~{minutesLeft} min.
+              </p>
+            )}
             <p className="err">{err}</p>
             <div className="actions">
               <button type="button" className="linkbtn" onClick={onClose}>{t('cancel')}</button>
-              <button className="btn" disabled={processing}>{processing ? t('processing') : t('pay', { p: money(total) })}</button>
+              <button className="btn" disabled={processing || isReserved}>{processing ? t('processing') : t('pay', { p: money(total) })}</button>
             </div>
           </form>
         </>}

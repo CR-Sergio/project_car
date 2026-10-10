@@ -7,7 +7,8 @@ import { MXN_PER_USD } from './currency';
       El monto de cada link es el precio de la pieza (precio final).
    3) Para marcar piezas como vendidas automáticamente hace falta un backend con webhook. */
 export type PayMode = 'test' | 'live';
-export const PAY_MODE: PayMode = 'test';
+export const PAY_MODE: PayMode = (import.meta.env.VITE_PAY_MODE as PayMode) || 'test';
+export const API_BASE: string = import.meta.env.VITE_API_BASE || '';
 /** la meta del proyecto, en pesos (precio final, todo incluido) */
 export const GOAL_MXN = 150000;
 export const GOAL_USD = Math.round(GOAL_MXN / MXN_PER_USD / 50) * 50;
