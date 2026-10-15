@@ -23,8 +23,7 @@ export default function PrivacyPage() {
         <li><strong>De la operación:</strong> pieza comprada, monto, fecha y folio del pago, y la fecha y hora en que aceptaste los términos, este aviso y la política de no reembolsos.</li>
       </ul>
       <p>
-        <strong>No recabamos datos de tu tarjeta ni de tu cuenta bancaria:</strong> el pago lo procesan directamente Mercado Pago o
-        Stripe, bajo sus propios avisos de privacidad. <strong>No tratamos datos personales sensibles.</strong>
+        <strong>No recabamos datos de tu tarjeta ni de tu cuenta bancaria:</strong> el pago lo procesa directamente PayPal, bajo sus propios avisos de privacidad. <strong>No tratamos datos personales sensibles.</strong>
       </p>
 
       <h2><span className="n">2.</span>Para qué los usamos</h2>

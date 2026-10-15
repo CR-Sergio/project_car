@@ -55,9 +55,9 @@ export default function TermsPage() {
       <H>Precio y pago</H>
       <ul>
         <li>Los precios están en pesos mexicanos y son <strong>precio final</strong>: incluyen diseño, impresión, instalación y retiro del vinil. No hay cargos adicionales de nuestra parte.</li>
-        <li>Los precios en dólares son de referencia. El cobro en dólares lo hace Stripe con su tipo de cambio; las comisiones o diferencias cambiarias que cobre tu banco son tuyas.</li>
-        <li>El pago es único, por adelantado, por Pieza, y se procesa por Mercado Pago o Stripe. No recibimos ni guardamos datos de tu tarjeta.</li>
-        <li>Una Pieza se considera vendida solo cuando la pasarela confirma el pago. Si dos personas pagan la misma Pieza, se queda con ella la que pagó primero y a la otra se le devuelve íntegro su pago.</li>
+        <li>Los precios en dólares son de referencia. El cobro en dólares se procesa mediante PayPal con su tipo de cambio; las comisiones o diferencias cambiarias que cobre tu banco son tuyas.</li>
+        <li>El pago es único, por adelantado, por Pieza, y se procesa mediante PayPal. No recibimos ni guardamos datos de tu tarjeta.</li>
+        <li>Una Pieza se considera vendida una vez que se valida el pago con tu Folio de compra. Las piezas quedan apartadas temporalmente por 2 horas mientras se procesa la validación.</li>
       </ul>
 
       <H>Inicio del Servicio</H>
