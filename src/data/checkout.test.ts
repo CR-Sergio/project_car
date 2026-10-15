@@ -42,4 +42,33 @@ describe('Checkout Validation and Calculations', () => {
     const idempotencyKey = `session_${partId}_${email.trim().toLowerCase()}_${timestampMinute}`;
     expect(idempotencyKey).toBe('session_cofre_sponsor@empresa.com_28808333');
   });
+
+  it('builds dynamic PayPal.Me checkout URLs accurately with amount and currency', () => {
+    const paypalUser = 'ProyectCar';
+    const cofrePrice = 18000;
+    const msgPrice = 100;
+
+    const cofreUrl = `https://paypal.me/${encodeURIComponent(paypalUser)}/${cofrePrice}MXN`;
+    const msgUrl = `https://paypal.me/${encodeURIComponent(paypalUser)}/${msgPrice}MXN`;
+
+    expect(cofreUrl).toBe('https://paypal.me/ProyectCar/18000MXN');
+    expect(msgUrl).toBe('https://paypal.me/ProyectCar/100MXN');
+  });
+
+  it('validates 6-character alphanumeric folio structure', () => {
+    const folioRegex = /^PC-[A-Z0-9]{6}$/;
+    const sampleFolio = 'PC-9K4B2M';
+    expect(folioRegex.test(sampleFolio)).toBe(true);
+    expect(folioRegex.test('PC-12345')).toBe(false);
+  });
+
+  it('calculates 2-hour reservation expiry accurately (7,200,000 ms)', () => {
+    const now = 1700000000000;
+    const reservationMs = 2 * 60 * 60 * 1000;
+    const expiresAt = now + reservationMs;
+
+    expect(expiresAt - now).toBe(7200000);
+    expect((expiresAt - now) / 60000).toBe(120); // 120 minutes
+  });
 });
+

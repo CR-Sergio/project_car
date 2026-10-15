@@ -17,6 +17,8 @@ export interface Part {
   mp: string;
   stripe: string;
   stripeUsd?: string;
+  paypal?: string;
+  paypalUsd?: string;
   /** barras del garage, 1-10 */
   vis: number;
   tam: number;
@@ -27,7 +29,7 @@ export interface Part {
   kind?: 'messages' | 'names';
 }
 
-type PartInput = Omit<Part, 'usd' | 'mp' | 'stripe'> & Partial<Pick<Part, 'mp' | 'stripe'>>;
+type PartInput = Omit<Part, 'usd' | 'mp' | 'stripe' | 'paypal'> & Partial<Pick<Part, 'mp' | 'stripe' | 'paypal'>>;
 const RAW: PartInput[] = [
   {id:'cofre',      name:'Cofre',                           en:'Hood',                   price:18000, zone:'Frente',    size:'≈ 115 × 150 cm', vis:9, tam:8, cuadro:9},
   {id:'parabrisas', name:'Franja del parabrisas',           en:'Windshield banner',      price:13000, zone:'Frente',    size:'≈ 130 × 20 cm',  vis:9, tam:4, cuadro:9, glass:true},
@@ -45,7 +47,7 @@ const RAW: PartInput[] = [
   {id:'medallon',   name:'Medallón (vidrio trasero)',       en:'Rear window',            price:12000, zone:'Atrás',     size:'≈ 95 × 45 cm',   vis:8, tam:5, cuadro:7, glass:true},
   {id:'defensa-t',  name:'Defensa trasera',                 en:'Rear bumper',            price:8000,  zone:'Atrás',     size:'≈ 160 × 25 cm',  vis:8, tam:3, cuadro:6},
 ];
-export const PARTS: Part[] = RAW.map(p => ({ mp: '', stripe: '', ...p, usd: usdOf(p.price) }));
+export const PARTS: Part[] = RAW.map(p => ({ mp: '', stripe: '', paypal: '', ...p, usd: usdOf(p.price) }));
 
 export const ZONES: Zone[] = ['Frente', 'Arriba', 'Lado izq.', 'Lado der.', 'Atrás'];
 export const ZONE_EN: Record<Zone, string> = {'Frente':'Front','Arriba':'Top','Lado izq.':'Left side','Lado der.':'Right side','Atrás':'Rear'};

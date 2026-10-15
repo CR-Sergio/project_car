@@ -11,6 +11,7 @@ import { ToastProvider } from './toast';
 const GaragePage = lazy(() => import('../pages/garage/GaragePage'));
 const PrivacyPage = lazy(() => import('../pages/legal/PrivacyPage'));
 const TermsPage = lazy(() => import('../pages/legal/TermsPage'));
+const AdminPage = lazy(() => import('../pages/admin/AdminPage'));
 
 function GarageFallback() {
   return <div id="taller" aria-busy="true" />;
@@ -26,6 +27,7 @@ export function App() {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/garage/:partId?" element={<Suspense fallback={<GarageFallback />}><GaragePage /></Suspense>} />
+                <Route path="/admin" element={<Suspense><AdminPage /></Suspense>} />
                 <Route path="/aviso-de-privacidad" element={<Suspense><PrivacyPage /></Suspense>} />
                 <Route path="/terminos" element={<Suspense><TermsPage /></Suspense>} />
                 <Route path="*" element={<LandingPage />} />

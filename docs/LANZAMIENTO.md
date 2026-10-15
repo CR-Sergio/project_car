@@ -34,7 +34,7 @@ Cotiza con 2 o 3 talleres para confirmarlo.
 - [ ] Tener un correo real de contacto que revises: por ahí llegan logos, aclaraciones, contracargos y derechos ARCO (plazo de respuesta: 20 días hábiles).
 - [ ] Guardar por cada venta la evidencia: fecha y hora de aceptación de términos y de la política de ventas finales, correos con el logo y la aprobación del diseño, y fotos de la instalación. Es lo que te defiende en un contracargo.
 
-## 3. Pagos y Base de Datos (Cloudflare D1 + Stripe Checkout)
+## 3. Pagos y Base de Datos (Cloudflare D1 + PayPal Estándar / PayPal.Me)
 
 El backend serverless ya está implementado en `functions/api/` y el esquema SQL en `d1/schema.sql`.
 
@@ -43,17 +43,15 @@ Pasos para activar en producción:
   - En Cloudflare Dashboard > *Workers & Pages* > *D1* > *Create Database* con el nombre `proyect_car_db` (o ejecuta: `npx wrangler d1 create proyect_car_db`).
   - En tu proyecto de Cloudflare Pages > *Settings* > *Functions* > *D1 database bindings*, vincula la variable `DB` apuntando a `proyect_car_db`.
   - Ejecuta el esquema en la base de datos: copia y pega el contenido de `d1/schema.sql` en la consola SQL de D1 en Cloudflare (o ejecuta: `npx wrangler d1 execute proyect_car_db --file=./d1/schema.sql`).
-- [ ] **Configurar Stripe**:
-  - Crear cuenta en Stripe (a tu nombre y RFC).
-  - En Stripe Dashboard > *Developers* > *API keys*, copia la Secret Key (`sk_live_...` o `sk_test_...` para pruebas).
+- [ ] **Configurar PayPal Personal (PayPal.Me) y Panel de Administración**:
   - En Cloudflare Pages > *Settings* > *Environment variables*, agrega:
-    - `STRIPE_SECRET_KEY`: Tu clave secreta de Stripe.
-    - `VITE_PAY_MODE`: `live` (o `test` para pruebas).
-- [ ] **Configurar el Webhook de Stripe**:
-  - En Stripe Dashboard > *Developers* > *Webhooks* > *Add endpoint*.
-  - Endpoint URL: `https://tudominio.com/api/webhook`
-  - Eventos a escuchar: `checkout.session.completed` y `checkout.session.expired`.
-  - Copia el *Signing secret* (`whsec_...`) y agrégalo en las variables de Cloudflare Pages como `STRIPE_WEBHOOK_SECRET`.
+    - `VITE_PAYPAL_ME_USER`: Tu usuario de PayPal.Me (ej. `TuCuenta`).
+    - `ADMIN_SECRET_KEY`: Contraseña segura para acceder a `https://tudominio.com/admin` y autorizar pagos recibidos.
+    - `VITE_PAY_MODE`: `live` (o `test` para pruebas locales).
+- [ ] **Operación de Cobros**:
+  - Los compradores apartan la pieza por 2 horas y reciben un Folio único (ej. `PC-9K4B2M`).
+  - El comprador transfiere a tu PayPal.Me indicando el Folio en la nota.
+  - Al ver el dinero en tu cuenta de PayPal, entras a `https://tudominio.com/admin`, introduces tu `ADMIN_SECRET_KEY` y haces clic en **✓ Aprobar Pago** para activar la pieza en el auto 3D en tiempo real.
 - [ ] **Crear el bucket de almacenamiento Cloudflare R2 (para logos PNG)**:
   - En Cloudflare Dashboard > *R2* > *Create Bucket* con el nombre `proyect-car-assets` (o ejecuta: `npx wrangler r2 bucket create proyect-car-assets`).
   - En Cloudflare Pages > *Settings* > *Functions* > *R2 bucket bindings*, vincula la variable `BUCKET` apuntando a `proyect-car-assets`.

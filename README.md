@@ -77,11 +77,12 @@ Son 12 piezas para marcas, 2 salpicaderas de mensajes y el techo con los nombres
 
 Para cobrar de verdad:
 
-1. Crea un Payment Link por pieza en Mercado Pago (`mp`) y/o Stripe (`stripe`; `stripeUsd` para cobrar en dólares), por el precio de la pieza.
-2. Pégalos en cada pieza de `PARTS` y cambia `PAY_MODE` a `'live'`.
-3. Para marcar piezas como vendidas automáticamente hace falta un backend con webhook (por ejemplo Supabase o Vercel Functions). En el código, `src/state/sales.tsx` es el único lugar que tendría que cambiar.
-
-Todo lo que hay que tener en regla fuera del código (impuestos, evidencia de cada venta, seguro, vidrios, municipio, redes) está en [`docs/LANZAMIENTO.md`](docs/LANZAMIENTO.md).
+1. Crea tu cuenta en Stripe y configura las claves en las variables de Cloudflare Pages.
+2. La arquitectura serverless está implementada en `functions/api/` usando **Cloudflare D1** como base de datos y **Cloudflare R2** para los logos.
+3. Guías detalladas de configuración:
+   - Base de Datos D1: [`docs/CLOUDFLARE_D1_SETUP.md`](docs/CLOUDFLARE_D1_SETUP.md)
+   - Integración de Stripe y Webhooks: [`docs/STRIPE_INTEGRATION.md`](docs/STRIPE_INTEGRATION.md)
+   - Pasos para el lanzamiento comercial: [`docs/LANZAMIENTO.md`](docs/LANZAMIENTO.md)
 
 ## Rendimiento
 

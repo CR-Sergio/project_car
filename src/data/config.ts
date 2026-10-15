@@ -9,6 +9,8 @@ import { MXN_PER_USD } from './currency';
 export type PayMode = 'test' | 'live';
 export const PAY_MODE: PayMode = (import.meta.env.VITE_PAY_MODE as PayMode) || 'test';
 export const API_BASE: string = import.meta.env.VITE_API_BASE || '';
+/** Usuario de PayPal.Me para cobros directos (ej: https://paypal.me/TuUsuario/monto) */
+export const PAYPAL_ME_USER: string = import.meta.env.VITE_PAYPAL_ME_USER || 'ProyectCar';
 /** la meta del proyecto, en pesos (precio final, todo incluido) */
 export const GOAL_MXN = 150000;
 export const GOAL_USD = Math.round(GOAL_MXN / MXN_PER_USD / 50) * 50;

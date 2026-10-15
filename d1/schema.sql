@@ -11,20 +11,27 @@ CREATE TABLE IF NOT EXISTS sales (
   logo_url TEXT,
   email TEXT NOT NULL,
   link TEXT,
+  folio TEXT,                               -- Folio único de compra (ej. PC-A4B7C9)
+  price INTEGER DEFAULT 0,                  -- Monto oficial acordado en la orden
+  currency TEXT DEFAULT 'MXN',              -- Divisa ('MXN' | 'USD')
   status TEXT NOT NULL DEFAULT 'available', -- 'available' | 'reserved' | 'sold'
-  reserved_until INTEGER,                   -- Unix timestamp (ms) hasta cuando dura el apartado (15 min)
-  stripe_session_id TEXT,                   -- ID de la sesión de Stripe Checkout
-  stripe_invoice_id TEXT,                   -- ID de la factura generada por Stripe Invoicing
+  reserved_until INTEGER,                   -- Unix timestamp (ms) duración de apartado (2 horas)
+  stripe_session_id TEXT,                   -- Histórico / referencia opcional
+  stripe_invoice_id TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );
 
 -- 2. Tabla de Mensajes de la Raza (salpicaderas)
 CREATE TABLE IF NOT EXISTS messages (
   id TEXT PRIMARY KEY,
-  part_id TEXT NOT NULL,                    -- 'fender_l' | 'fender_r'
+  part_id TEXT NOT NULL,                    -- 'salpi-i' | 'salpi-d'
   text TEXT NOT NULL,                       -- Mensaje (máx. 24 caracteres)
   name TEXT,                                -- Nombre de cortesía para el techo (opcional, máx. 20 caracteres)
   email TEXT NOT NULL,
+  folio TEXT,                               -- Folio único de compra (ej. PC-M7K2X1)
+  price INTEGER DEFAULT 100,
+  currency TEXT DEFAULT 'MXN',
+  status TEXT NOT NULL DEFAULT 'approved',  -- 'pending' | 'approved' | 'rejected'
   stripe_session_id TEXT,
   stripe_invoice_id TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
@@ -32,4 +39,7 @@ CREATE TABLE IF NOT EXISTS messages (
 
 -- Índices para optimizar búsquedas frecuentes
 CREATE INDEX IF NOT EXISTS idx_sales_status ON sales(status);
+CREATE INDEX IF NOT EXISTS idx_sales_folio ON sales(folio);
 CREATE INDEX IF NOT EXISTS idx_messages_part ON messages(part_id);
+CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
+CREATE INDEX IF NOT EXISTS idx_messages_folio ON messages(folio);

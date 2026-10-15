@@ -69,9 +69,9 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       }
     }
 
-    // 2. Obtener mensajes de las salpicaderas y nombres del techo
+    // 2. Obtener mensajes aprobados de las salpicaderas y nombres del techo
     const messagesQuery = await env.DB.prepare(
-      `SELECT id, part_id, text, name FROM messages ORDER BY created_at ASC`
+      `SELECT id, part_id, text, name FROM messages WHERE status IS NULL OR status = 'approved' ORDER BY created_at ASC`
     ).all<MessageRow>();
 
     const byPart: Record<string, string[]> = {

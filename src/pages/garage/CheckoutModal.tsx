@@ -10,7 +10,11 @@ import { useLocale } from '../../state/locale';
 import { useSales } from '../../state/sales';
 import '../../styles/checkout.css';
 
-type Step = { kind: 'form' } | { kind: 'redirect'; url: string; via: string } | { kind: 'done'; brand: string; via: string };
+type Step =
+  | { kind: 'form' }
+  | { kind: 'redirect'; url: string; via: string }
+  | { kind: 'done'; brand: string; via: string }
+  | { kind: 'paypal'; folio: string; paypalUrl: string; amount: number; cur: string; expiresAt: number; brand: string };
 
 /** Buy a part (brand, color, email, optional logo) or a message on a fender (message, optional free name
     for the roof, email). In test mode the payment is simulated. */
@@ -26,11 +30,19 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
   const [brand, setBrand] = useState(''), [color, setColor] = useState('#2f6fe0'), [email, setEmail] = useState(''), [link, setLink] = useState('');
   const [logo, setLogo] = useState<HTMLImageElement | null>(null);
   const [logoFile, setLogoFile] = useState<File | null>(null);
-  const [method, setMethod] = useState<'mp' | 'stripe'>('stripe');
   const [err, setErr] = useState(''), [processing, setProcessing] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [accepted, setAccepted] = useState(false), [finalSale, setFinalSale] = useState(false), [noNews, setNoNews] = useState(false);
   const total = priceOf(p);
   const modal = useRef<HTMLDivElement>(null), pv = useRef<HTMLCanvasElement>(null), first = useRef<HTMLInputElement>(null), ok = useRef<HTMLButtonElement>(null);
+
+  function copyFolio(folio: string) {
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(folio);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
+  }
 
   const closeRef = useRef(onClose); closeRef.current = onClose;
   // focus goes into the sheet, stays there (Tab wraps), and returns where it was on close
@@ -76,69 +88,69 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
     if (!finalSale) return setErr(t('errRefund'));
     if (isMsg && roof && !consent) return setErr(t('errNameConsent'));
     if (isMsg && (wall.byPart[partId]?.length ?? 0) >= MESSAGES_PER_PART) return setErr(t('msgFull'));
-    const via = method === 'mp' ? 'Mercado Pago' : 'Stripe';
+    const via = 'PayPal';
     if (PAY_MODE === 'live') {
-      if (method === 'stripe') {
-        setProcessing(true);
-        setErr('');
+      setProcessing(true);
+      setErr('');
 
-        const proceedWithCheckout = (uploadedLogoUrl?: string) => {
-          fetch(`${API_BASE}/api/create-checkout-session`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              partId,
-              brand: b,
-              color,
-              email: m,
-              link: link.trim(),
-              logoUrl: uploadedLogoUrl,
-              msg: b,
-              roofName: roof ? name : undefined,
-              news: !noNews,
-              cur,
-            }),
+      const proceedWithCheckout = (uploadedLogoUrl?: string) => {
+        fetch(`${API_BASE}/api/create-paypal-order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            partId,
+            brand: b,
+            color,
+            email: m,
+            link: link.trim(),
+            logoUrl: uploadedLogoUrl,
+            msg: b,
+            roofName: roof ? name : undefined,
+            cur,
+          }),
+        })
+          .then(async res => {
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error al iniciar apartado en PayPal');
+            confetti(isMsg ? '#f1c232' : color);
+            setProcessing(false);
+            setStep({
+              kind: 'paypal',
+              folio: data.folio,
+              paypalUrl: data.paypalUrl,
+              amount: data.amount,
+              cur: data.currency,
+              expiresAt: data.expiresAt,
+              brand: isMsg ? (roof ? name : '') : b,
+            });
           })
-            .then(async res => {
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.error || 'Error al iniciar checkout');
-              if (data.checkoutUrl) {
-                window.location.href = data.checkoutUrl;
-              } else {
-                throw new Error('No se recibió enlace de pago');
-              }
-            })
-            .catch(err => {
-              setProcessing(false);
-              setErr(err?.message || 'Error al conectar con la pasarela de pago');
-            });
-        };
+          .catch(err => {
+            setProcessing(false);
+            setErr(err?.message || 'Error al conectar con la pasarela de PayPal');
+          });
+      };
 
-        if (logoFile) {
-          const fd = new FormData();
-          fd.append('file', logoFile);
-          fd.append('partId', partId);
-          fetch(`${API_BASE}/api/upload-logo`, { method: 'POST', body: fd })
-            .then(async r => {
-              if (!r.ok) {
-                const errData = await r.json().catch(() => ({}));
-                throw new Error(errData.error || 'Error al subir el archivo de logo');
-              }
-              return r.json();
-            })
-            .then(data => proceedWithCheckout(data.logoUrl))
-            .catch(err => {
-              setProcessing(false);
-              setErr(err?.message || 'Error al procesar la imagen');
-            });
-        } else {
-          proceedWithCheckout();
-        }
-        return;
+      if (logoFile) {
+        const fd = new FormData();
+        fd.append('file', logoFile);
+        fd.append('partId', partId);
+        fetch(`${API_BASE}/api/upload-logo`, { method: 'POST', body: fd })
+          .then(async r => {
+            if (!r.ok) {
+              const errData = await r.json().catch(() => ({}));
+              throw new Error(errData.error || 'Error al subir el archivo de logo');
+            }
+            return r.json();
+          })
+          .then(data => proceedWithCheckout(data.logoUrl))
+          .catch(err => {
+            setProcessing(false);
+            setErr(err?.message || 'Error al procesar la imagen');
+          });
+      } else {
+        proceedWithCheckout();
       }
-      const url = usd && p.stripeUsd ? p.stripeUsd : p[method];
-      if (!url) return setErr(t('errLink'));
-      setStep({ kind: 'redirect', url, via }); return;
+      return;
     }
     setProcessing(true);
     setTimeout(() => {
@@ -154,6 +166,58 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
       <div className="sheet paper">
         {step.kind === 'redirect' && (
           <div className="done"><p>{t('opens', { x: step.via })}</p><a className="btn" href={step.url} target="_blank" rel="noopener">{t('goPay')}</a></div>
+        )}
+        {step.kind === 'paypal' && (
+          <div className="done" style={{ textAlign: 'left' }}>
+            <div className="big" style={{ fontSize: '26px', color: '#003087', textAlign: 'center', marginBottom: '8px' }}>
+              ¡Apartado Registrado!
+            </div>
+            <p style={{ textAlign: 'center', margin: '0 0 16px', fontSize: '13.5px', color: '#4d4752' }}>
+              Completa tu pago en <b>PayPal.Me</b> para que tu patrocinio sea validado y aparezca en el auto 3D.
+            </p>
+
+            <div className="paypal-box">
+              <span className="legend-label">1. Tu Folio de Compra</span>
+              <div className="paypal-folio-row">
+                <span className="paypal-folio-val">{step.folio}</span>
+                <button type="button" className="paypal-copy-btn" onClick={() => copyFolio(step.folio)}>
+                  {copied ? '✓ ¡Copiado!' : 'Copiar'}
+                </button>
+              </div>
+
+              <span className="legend-label">2. Monto Exacto a Enviar</span>
+              <div style={{ fontFamily: 'var(--f-display)', fontSize: '24px', margin: '4px 0 12px', color: 'var(--race)' }}>
+                ${step.amount.toLocaleString()} {step.cur}
+              </div>
+
+              <span className="legend-label">3. Instrucciones de Pago</span>
+              <ol className="paypal-steps">
+                <li>Haz clic en el botón azul para abrir <b>PayPal.Me</b>.</li>
+                <li>Envía exactamente <b>${step.amount.toLocaleString()} {step.cur}</b> con tu saldo o tarjeta.</li>
+                <li><b>Obligatorio:</b> En la nota / concepto de PayPal escribe tu Folio: <b>{step.folio}</b>.</li>
+              </ol>
+
+              <a
+                className="paypal-cta-btn"
+                href={step.paypalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span>Pagar ${step.amount.toLocaleString()} {step.cur} en PayPal.Me ↗</span>
+              </a>
+
+              <div className="paypal-timer-note">
+                <span>⏳</span>
+                <span><b>Tu pieza está apartada por 2 horas.</b> En cuanto validemos tu pago con el folio, aparecerá de inmediato en el auto 3D.</span>
+              </div>
+            </div>
+
+            <div style={{ textAlign: 'center', marginTop: '12px' }}>
+              <button className="btn" ref={ok} onClick={onClose} style={{ width: '100%' }}>
+                Listo / Continuar al taller
+              </button>
+            </div>
+          </div>
         )}
         {step.kind === 'done' && (
           <div className="done">
@@ -187,15 +251,15 @@ export function CheckoutModal({ partId, onClose }: { partId: string; onClose: ()
             <div className="preview"><canvas ref={pv} width={320} height={160} /><span>{t('preview')}</span></div>
             </>}
             <span className="legend-label">{t('payWith')}</span>
-            <div className="pay">
-              {!usd && <label><input type="radio" name="pm" value="mp" checked={method === 'mp'} onChange={() => setMethod('mp')} /> Mercado Pago</label>}
-              <label><input type="radio" name="pm" value="stripe" checked={method === 'stripe'} onChange={() => setMethod('stripe')} /> Stripe</label>
+            <div className="pay" style={{ gridTemplateColumns: '1fr' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <input type="radio" name="pm" value="paypal" checked={true} readOnly />
+                <span><b>PayPal</b> / Tarjeta de débito o crédito</span>
+              </label>
             </div>
-            {method === 'stripe' && (
-              <p className="fine" style={{ marginTop: '4px', color: '#635bff', fontWeight: 500 }}>
-                ✓ Incluye factura oficial en PDF con desglose de impuestos y campo para RFC / Tax ID.
-              </p>
-            )}
+            <p className="fine" style={{ marginTop: '2px', color: '#0070ba', fontWeight: 500 }}>
+              ✓ Pago seguro vía PayPal.Me. Se generará tu Folio oficial de compra y la pieza quedará apartada por 2 horas.
+            </p>
             {usd && <p className="sub">{t('usdNote')}</p>}
             <label className="check"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t(isMsg ? 'acceptName' : 'accept') }} /></label>
             <label className="check"><input type="checkbox" checked={finalSale} onChange={e => setFinalSale(e.target.checked)} /> <span dangerouslySetInnerHTML={{ __html: t(isMsg ? 'noRefundName' : 'noRefund') }} /></label>
