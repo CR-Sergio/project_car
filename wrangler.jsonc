@@ -20,5 +20,8 @@
       "binding": "BUCKET",
       "bucket_name": "proyect-car-assets"
     }
-  ]
+  ],
+  "vars": {
+    "PAYPAL_ME_USER": "proyectcar"
+  }
 }
