@@ -44,10 +44,11 @@ CREATE TABLE IF NOT EXISTS sales (
   logo_url TEXT,
   email TEXT NOT NULL,
   link TEXT,
+  folio TEXT,
+  price INTEGER DEFAULT 0,
+  currency TEXT DEFAULT 'MXN',
   status TEXT NOT NULL DEFAULT 'available',
   reserved_until INTEGER,
-  stripe_session_id TEXT,
-  stripe_invoice_id TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );
 ```
@@ -60,8 +61,10 @@ CREATE TABLE IF NOT EXISTS messages (
   text TEXT NOT NULL,
   name TEXT,
   email TEXT NOT NULL,
-  stripe_session_id TEXT,
-  stripe_invoice_id TEXT,
+  folio TEXT,
+  price INTEGER DEFAULT 100,
+  currency TEXT DEFAULT 'MXN',
+  status TEXT NOT NULL DEFAULT 'approved',
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );
 ```
@@ -69,8 +72,23 @@ CREATE TABLE IF NOT EXISTS messages (
 **Bloque 3: Crear los índices**
 ```sql
 CREATE INDEX IF NOT EXISTS idx_sales_status ON sales(status);
+CREATE INDEX IF NOT EXISTS idx_sales_folio ON sales(folio);
 CREATE INDEX IF NOT EXISTS idx_messages_part ON messages(part_id);
+CREATE INDEX IF NOT EXISTS idx_messages_status ON messages(status);
+CREATE INDEX IF NOT EXISTS idx_messages_folio ON messages(folio);
 ```
+
+> [!NOTE]
+> **Si ya habías creado las tablas antes con un esquema previo**, ejecuta estas sentencias para agregar las columnas faltantes sin perder datos:
+> ```sql
+> ALTER TABLE sales ADD COLUMN folio TEXT;
+> ALTER TABLE sales ADD COLUMN price INTEGER DEFAULT 0;
+> ALTER TABLE sales ADD COLUMN currency TEXT DEFAULT 'MXN';
+> ALTER TABLE messages ADD COLUMN folio TEXT;
+> ALTER TABLE messages ADD COLUMN price INTEGER DEFAULT 100;
+> ALTER TABLE messages ADD COLUMN currency TEXT DEFAULT 'MXN';
+> ALTER TABLE messages ADD COLUMN status TEXT NOT NULL DEFAULT 'approved';
+> ```
 
 4. Para verificar que todo quedó creado correctamente, ejecuta:
 ```sql
@@ -90,6 +108,13 @@ Las Pages Functions en `/functions/api/` acceden a la base de datos a través de
 6. Haz clic en **Save**.
 7. Si el sitio ya tenía un despliegue activo, realiza un nuevo despliegue (o haz clic en *Redeploy* en el último deployment) para que las Functions tomen el nuevo binding.
 
+> [!WARNING]
+> **¿No puedes añadir el binding o Cloudflare dice que es un "Worker con datos estáticos"?**
+> Esto ocurre por una de dos razones:
+> 1. **El proyecto se creó como "Worker" en lugar de "Pages":** En el panel unificado de Cloudflare, al crear una aplicación puedes elegir entre *Worker* y *Pages*. Si seleccionaste *Worker con Static Assets*, Cloudflare no permite asociar bindings en el panel a menos que el Worker tenga un script de código (`main`). Como este proyecto utiliza **Cloudflare Pages Functions** (la carpeta `/functions`), el proyecto debe ser de tipo **Pages** (**Workers & Pages > Create Application > Pages > Connect to Git**).
+> 2. **Se desplegó únicamente la carpeta `dist/`:** Si subiste los archivos manualmente arrastrando solo la carpeta `dist` o ejecutaste un deploy que omitió la carpeta `/functions`, Cloudflare interpreta el despliegue como "Static-only" (solo activos estáticos sin backend). Al conectar el repositorio de Git a Cloudflare Pages, Cloudflare compila automáticamente tanto el frontend como `/functions`, activando de inmediato la sección de Functions y sus bindings.
+
+
 ---
 
 ## 3. Opción B: Configuración mediante Docker y Wrangler CLI
@@ -107,7 +132,7 @@ docker run --rm -it \
   npx wrangler d1 create proyect_car_db
 ```
 
-Este comando devolverá el `database_id` asignado por Cloudflare.
+Este comando devolverá el `database_id` asignado por Cloudflare (ej. `a1b2c3d4-e5f6-7890-abcd-ef1234567890`). Pégalo en tu archivo [`wrangler.jsonc`](file:///home/butzmann/.gemini/antigravity-ide/scratch/Project-car/project_car/wrangler.jsonc).
 
 ### Paso 2: Aplicar las migraciones / esquema SQL
 Para ejecutar el script SQL contra la base de datos remota en producción:
@@ -120,6 +145,19 @@ docker run --rm -it \
   node:20-alpine \
   npx wrangler d1 execute proyect_car_db --remote --file=./d1/schema.sql
 ```
+
+### Paso 3: Desplegar el Worker Fullstack con Activos Estáticos
+Con el punto de entrada [`worker/index.ts`](file:///home/butzmann/.gemini/antigravity-ide/scratch/Project-car/project_car/worker/index.ts) y [`wrangler.jsonc`](file:///home/butzmann/.gemini/antigravity-ide/scratch/Project-car/project_car/wrangler.jsonc) configurados:
+```bash
+docker run --rm -it \
+  -v "$(pwd)":/app \
+  -w /app \
+  -e CLOUDFLARE_API_TOKEN="<TU_CLOUDFLARE_API_TOKEN>" \
+  -e CLOUDFLARE_ACCOUNT_ID="<TU_ACCOUNT_ID>" \
+  node:20-alpine \
+  npx wrangler deploy
+```
+*Cloudflare compilará el Worker (`has_modules: true`), habilitará el binding `DB` y servirá el frontend de `/dist` mediante el binding `ASSETS`.*
 
 ---
 
@@ -149,7 +187,13 @@ Para que el backend funcione completamente junto a la base de datos D1:
    - En Cloudflare Pages > **Settings** > **Functions** > **R2 bucket bindings**:
      - Variable name: `BUCKET`
      - R2 bucket: `proyect-car-assets`
-2. **Variables de Entorno (Stripe)**:
+2. **Variables de Entorno para PayPal y Modo En Vivo**:
+   - `VITE_PAY_MODE`: `live` (activa cobros reales y generación de Folios; si está ausente se ejecuta en modo `test` simulado).
+   - `VITE_PAYPAL_ME_USER`: Tu usuario de PayPal.Me (ej. `TuUsuario`, para generar enlaces `https://paypal.me/TuUsuario/...`).
+   - `PAYPAL_ME_USER`: Mismo usuario de PayPal.Me para el runtime de Cloudflare Functions.
+   - `ADMIN_SECRET_KEY`: Contraseña segura para acceder a `https://tudominio.com/admin` y autorizar pagos recibidos.
+
+3. **Variables de Entorno Opcionales (Solo si usas Stripe en lugar de PayPal)**:
    - `STRIPE_SECRET_KEY`: Llave secreta de Stripe (`sk_live_...` o `sk_test_...`).
    - `STRIPE_WEBHOOK_SECRET`: Secreto del webhook (`whsec_...`).
    - `SITE_URL`: URL oficial del dominio (ej. `https://proyectcar.com`).

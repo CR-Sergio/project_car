@@ -4,6 +4,7 @@
 interface Env {
   DB?: D1Database;
   PAYPAL_ME_USER?: string;
+  VITE_PAYPAL_ME_USER?: string;
 }
 
 // Precios oficiales del servidor en MXN (para nunca confiar en el cliente)
@@ -189,7 +190,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     }
 
     // 2. Construir la URL oficial de PayPal.Me
-    const paypalUser = env.PAYPAL_ME_USER || 'ProyectCar';
+    const paypalUser = env.PAYPAL_ME_USER || env.VITE_PAYPAL_ME_USER || 'ProyectCar';
     // Ejemplo: https://paypal.me/ProyectCar/18000MXN o /100MXN
     const paypalUrl = `https://paypal.me/${encodeURIComponent(paypalUser)}/${amount}${currency}`;
 

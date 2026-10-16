@@ -1,0 +1,2 @@
+# Cloudflare Pages SPA fallback: redirige todas las rutas al index.html manteniendo HTTP 200
+/*    /index.html   200

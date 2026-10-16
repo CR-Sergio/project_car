@@ -16,8 +16,6 @@ CREATE TABLE IF NOT EXISTS sales (
   currency TEXT DEFAULT 'MXN',              -- Divisa ('MXN' | 'USD')
   status TEXT NOT NULL DEFAULT 'available', -- 'available' | 'reserved' | 'sold'
   reserved_until INTEGER,                   -- Unix timestamp (ms) duración de apartado (2 horas)
-  stripe_session_id TEXT,                   -- Histórico / referencia opcional
-  stripe_invoice_id TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );
 
@@ -32,8 +30,6 @@ CREATE TABLE IF NOT EXISTS messages (
   price INTEGER DEFAULT 100,
   currency TEXT DEFAULT 'MXN',
   status TEXT NOT NULL DEFAULT 'approved',  -- 'pending' | 'approved' | 'rejected'
-  stripe_session_id TEXT,
-  stripe_invoice_id TEXT,
   created_at INTEGER NOT NULL DEFAULT (unixepoch() * 1000)
 );
 
